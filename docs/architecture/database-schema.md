@@ -38,11 +38,18 @@ CREATE TABLE public.emails (
   body_text TEXT,  
   embedding VECTOR(1536),  
   metadata JSONB,  
+  is_filtered BOOLEAN DEFAULT FALSE,
+  filter_reason TEXT,
+  processed_at TIMESTAMPTZ,
+  text_chunks JSONB,
+  vectorized_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,  
   UNIQUE (user_id, google_message_id)  
 );  
 CREATE INDEX ON public.emails (user_id);  
 CREATE INDEX ON public.emails USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX ON public.emails (is_filtered);
+CREATE INDEX ON public.emails (vectorized_at);
 
 CREATE TABLE public.participants (  
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),  
@@ -59,4 +66,30 @@ CREATE TABLE public.email_participants (
   PRIMARY KEY (email_id, participant_id, role)  
 );  
 CREATE INDEX ON public.email_participants (participant_id);
+
+-- Filter configuration table
+CREATE TABLE public.filter_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  domain_pattern TEXT NOT NULL,
+  filter_type TEXT NOT NULL CHECK (filter_type IN ('blacklist', 'whitelist')),
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  UNIQUE (user_id, domain_pattern)
+);
+
+CREATE INDEX ON public.filter_config (user_id);
+
+-- Attachments table
+CREATE TABLE public.attachments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email_id UUID NOT NULL REFERENCES public.emails(id) ON DELETE CASCADE,
+  filename TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  size_bytes BIGINT NOT NULL,
+  content_text TEXT,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE INDEX ON public.attachments (email_id);
+CREATE INDEX ON public.attachments (mime_type);
 ``` 
