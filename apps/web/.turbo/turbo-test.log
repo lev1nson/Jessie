@@ -1,0 +1,14 @@
+
+> web@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.4 /Users/max/Documents/Coding/Jessie/apps/web
+
+ ✓ src/app/page.test.tsx (1 test) 15ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  19:19:28
+   Duration  458ms (transform 24ms, setup 34ms, collect 66ms, tests 15ms, environment 196ms, prepare 34ms)
+

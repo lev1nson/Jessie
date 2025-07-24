@@ -1,0 +1,16 @@
+{
+  "name": "@jessie/db",
+  "version": "1.0.0",
+  "description": "Database migrations and configuration for Jessie",
+  "private": true,
+  "scripts": {
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:generate-types": "supabase gen types typescript --local > ../packages/lib/src/database.types.ts",
+    "migrate": "supabase db push"
+  },
+  "devDependencies": {
+    "supabase": "^1.178.2"
+  }
+}
