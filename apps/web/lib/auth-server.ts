@@ -10,11 +10,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-// Client-side Supabase client
-export const createClientSupabaseClient = () => {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
-};
-
 // Server-side Supabase client for server components
 export const createServerSupabaseClient = () => {
   const cookieStore = cookies();

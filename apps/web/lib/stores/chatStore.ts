@@ -7,7 +7,7 @@ import { Chat, Message, ChatState, CreateChatRequest, SendMessageRequest } from 
 interface ChatActions {
   // Chat management
   loadChats: () => Promise<void>;
-  createChat: (request: CreateChatRequest) => Promise<string>;
+  createChat: (request: CreateChatRequest) => Promise<string | null>;
   selectChat: (chatId: string) => Promise<void>;
   updateChatTitle: (chatId: string, title: string) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
@@ -96,7 +96,8 @@ export const useChatStore = create<ChatStore>()(
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create chat');
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to create chat: ${response.status}`);
         }
 
         const { chat }: { chat: Chat } = await response.json();
@@ -116,7 +117,14 @@ export const useChatStore = create<ChatStore>()(
 
         return chat.id;
       } catch (error) {
-        throw new Error(error instanceof Error ? error.message : 'Failed to create chat');
+        console.error('Chat creation error:', error);
+        set((state) => ({ 
+          error: { 
+            ...state.error, 
+            createChat: error instanceof Error ? error.message : 'Failed to create chat' 
+          } 
+        }));
+        return null;
       }
     },
 
@@ -236,12 +244,15 @@ export const useChatStore = create<ChatStore>()(
       }));
 
       try {
-        const response = await fetch(`/api/chats/${request.chatId}/messages`, {
+        const response = await fetch('/api/chat/messages', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ content: request.content }),
+          body: JSON.stringify({ 
+            chatId: request.chatId,
+            content: request.content 
+          }),
         });
 
         if (!response.ok) {

@@ -65,9 +65,17 @@ export async function GET(request: NextRequest) {
     );
 
     // Exchange code for session
+    console.log('Exchanging code for session...');
     const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
+    console.log('Session exchange result:', {
+      hasSession: !!sessionData?.session,
+      hasUser: !!sessionData?.user,
+      error: sessionError?.message
+    });
+
     if (sessionError) {
+      console.error('Session exchange failed:', sessionError);
       secureLog('error', 'Session exchange failed', { 
         error: sessionError.message, 
         clientIP 
@@ -168,6 +176,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    console.log('Redirecting to:', redirectUrl);
+    console.log('Session cookies should be set, redirecting...');
+    
     return NextResponse.redirect(new URL(redirectUrl, request.url));
 
   } catch (error) {

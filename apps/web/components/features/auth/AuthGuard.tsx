@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientSupabaseClient } from '../../../lib/auth';
+import { createClientSupabaseClient } from '../../../lib/auth-client';
 import type { User } from '@supabase/supabase-js';
 
 interface AuthGuardProps {

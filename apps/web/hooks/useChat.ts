@@ -19,6 +19,10 @@ export function useChat() {
         firstMessage 
       });
       
+      if (!chatId) {
+        throw new Error('Failed to create chat');
+      }
+      
       if (firstMessage) {
         await store.sendMessage({ chatId, content: firstMessage });
       }
@@ -45,10 +49,29 @@ export function useChat() {
     return store.currentChat.id;
   };
 
+  // Helper function to create a new empty chat
+  const createNewChat = async () => {
+    try {
+      const chatId = await store.createChat({ 
+        title: 'New Chat' 
+      });
+      
+      if (!chatId) {
+        throw new Error('Failed to create chat');
+      }
+      
+      return chatId;
+    } catch (error) {
+      console.error('Failed to create new chat:', error);
+      throw error;
+    }
+  };
+
   return {
     // State
     chats: store.chats,
     currentChat: store.currentChat,
+    activeChat: store.currentChat?.id,
     messages: store.messages,
     loading: store.loading,
     error: store.error,
@@ -67,5 +90,6 @@ export function useChat() {
     // Helper functions
     startNewChat,
     sendMessageInCurrentChat,
+    createNewChat,
   };
 }

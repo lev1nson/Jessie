@@ -25,26 +25,56 @@ export function GoogleLoginButton({
       setError(null);
       onLoading?.(true);
 
+      console.log('Initiating Google login request...');
+
       const response = await fetch('/api/auth/google/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          redirectTo: redirectTo || window.location.origin + '/dashboard',
+          redirectTo: redirectTo || window.location.origin + '/auth/callback',
         }),
       });
 
-      const data = await response.json();
+      console.log('Response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
 
-      if (response.ok && data.url) {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (data.url) {
+        console.log('Redirecting to:', data.url);
         window.location.href = data.url;
       } else {
-        throw new Error(data.error || 'Failed to initiate login');
+        throw new Error(data.error || 'No redirect URL received');
       }
     } catch (error) {
-      console.error('Login error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to login. Please try again.';
+      console.error('Login error details:', {
+        error,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error,
+        isNetworkError: error instanceof TypeError && error.message.includes('fetch')
+      });
+      
+      let errorMessage: string;
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = 'Network error: Unable to connect to authentication service. Please check your connection and try again.';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = 'Failed to login. Please try again.';
+      }
       
       if (isRetry) {
         setRetryCount(prev => prev + 1);

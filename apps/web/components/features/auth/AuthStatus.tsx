@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { createClientSupabaseClient } from '../../../lib/auth';
+import { createClientSupabaseClient } from '../../../lib/auth-client';
 import { cn } from '@jessie/ui';
 import { ErrorAlert } from '../../ui/ErrorAlert';
 import type { User } from '@supabase/supabase-js';

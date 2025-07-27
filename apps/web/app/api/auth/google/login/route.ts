@@ -22,7 +22,19 @@ const ALLOWED_DOMAINS = [
 export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request);
   
+  console.log('Google OAuth POST request received', { clientIP });
+  
   try {
+    // Check if required environment variables are configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || 
+        !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        !process.env.NEXTAUTH_URL ||
+        process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('your_')) {
+      return NextResponse.json(
+        { error: 'Authentication service is not configured. Please contact administrator.' },
+        { status: 503 }
+      );
+    }
     // Rate limiting
     const rateLimit = checkRateLimit(`login:${clientIP}`, 60000, 5);
     if (!rateLimit.allowed) {
@@ -67,22 +79,30 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const finalRedirectTo = redirectTo || `${process.env.NEXTAUTH_URL}/dashboard`;
+    const finalRedirectTo = redirectTo || `${process.env.NEXTAUTH_URL}/auth/callback`;
+
+    console.log('Initiating OAuth with Supabase', {
+      provider: 'google',
+      redirectTo: finalRedirectTo,
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL
+    });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         scopes: 'email profile https://www.googleapis.com/auth/gmail.readonly',
-        redirectTo: `${process.env.NEXTAUTH_URL}/api/auth/google/callback`,
+        redirectTo: finalRedirectTo,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
-          state: encodeURIComponent(finalRedirectTo),
         },
       },
     });
 
+    console.log('Supabase OAuth response', { data: data?.url ? 'URL received' : 'No URL', error: error?.message });
+
     if (error) {
+      console.error('OAuth initiation error:', error);
       secureLog('error', 'OAuth initiation failed', { error: error.message, clientIP });
       return NextResponse.json(
         { error: 'Failed to initiate OAuth flow' },
@@ -90,12 +110,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!data?.url) {
+      console.error('No OAuth URL returned from Supabase');
+      return NextResponse.json(
+        { error: 'No OAuth URL received' },
+        { status: 500 }
+      );
+    }
+
     secureLog('info', 'OAuth flow initiated', { clientIP });
     return NextResponse.json({ url: data.url });
   } catch (error) {
+    console.error('Login route catch error:', error);
     secureLog('error', 'Login route error', { error: String(error), clientIP });
     
     if (error instanceof z.ZodError) {
+      console.error('Validation error:', error.errors);
       return NextResponse.json(
         { error: 'Invalid request data', details: error.errors },
         { status: 400 }
@@ -109,51 +139,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const redirectTo = searchParams.get('redirectTo');
-    
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll: () => cookieStore.getAll(),
-          setAll: (cookiesToSet) => {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
-          },
-        },
-      }
-    );
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        scopes: 'email profile https://www.googleapis.com/auth/gmail.readonly',
-        redirectTo: redirectTo || `${process.env.NEXTAUTH_URL}/api/auth/google/callback`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    });
-
-    if (error) {
-      console.error('OAuth error:', error);
-      return NextResponse.redirect(
-        new URL('/auth/login?error=oauth_failed', request.url)
-      );
-    }
-
-    return NextResponse.redirect(data.url);
-  } catch (error) {
-    console.error('Login route error:', error);
-    return NextResponse.redirect(
-      new URL('/auth/login?error=server_error', request.url)
-    );
-  }
-}

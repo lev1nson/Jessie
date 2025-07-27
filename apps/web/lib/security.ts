@@ -168,7 +168,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
 
 // Environment validation
 export function validateEnvironment(): void {
-  // Skip validation in test environment
+  // Skip validation in test environment or development with placeholder values
   if (process.env.NODE_ENV === 'test') {
     return;
   }
@@ -183,12 +183,27 @@ export function validateEnvironment(): void {
     'NEXTAUTH_URL',
   ];
 
-  const missing = requiredEnvVars.filter(envVar => !process.env[envVar]);
+  const missing = requiredEnvVars.filter(envVar => {
+    const value = process.env[envVar];
+    return !value || value.startsWith('your_') || value === 'your_supabase_url_here';
+  });
   
   if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    console.warn(`[AUTH] Missing or placeholder environment variables: ${missing.join(', ')}`);
+    console.warn(`[AUTH] Please configure these variables in .env.local for full functionality`);
+    
+    // Only throw in production
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    }
   }
 }
 
-// Initialize security validation on module load
-validateEnvironment();
+// Initialize security validation on module load (but don't throw in development)
+try {
+  validateEnvironment();
+} catch (error) {
+  if (process.env.NODE_ENV === 'production') {
+    throw error;
+  }
+}

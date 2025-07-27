@@ -34,7 +34,7 @@ export function ChatInterface() {
         <div className="p-4 border-b border-border">
           <ErrorAlert
             message={error.messages}
-            onClose={() => clearError('messages')}
+            onDismiss={() => clearError('messages')}
             onRetry={handleRetry}
           />
         </div>
@@ -44,7 +44,7 @@ export function ChatInterface() {
         <div className="p-4 border-b border-border">
           <ErrorAlert
             message={error.sending}
-            onClose={() => clearError('sending')}
+            onDismiss={() => clearError('sending')}
             onRetry={handleRetry}
           />
         </div>
