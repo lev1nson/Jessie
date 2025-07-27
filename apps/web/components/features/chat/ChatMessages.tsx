@@ -1,0 +1,134 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { MessageItem } from './MessageItem';
+import { Loader2 } from 'lucide-react';
+
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  sourceEmailIds?: string[];
+  createdAt: Date;
+}
+
+interface ChatMessagesProps {
+  messages: Message[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
+}
+
+export function ChatMessages({ 
+  messages, 
+  loading = false, 
+  error = null,
+  onRetry 
+}: ChatMessagesProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'end'
+      });
+    }
+  }, [messages.length]);
+
+  return (
+    <div 
+      ref={containerRef}
+      className="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth"
+      style={{ scrollbarGutter: 'stable' }}
+    >
+      {messages.length === 0 && !loading ? (
+        // Empty State
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg
+                className="w-8 h-8 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-4">
+              Welcome to Jessie
+            </h2>
+            <p className="text-muted-foreground mb-6 text-sm md:text-base">
+              Ask me anything about your emails. I can help you search, summarize, and understand your email conversations.
+            </p>
+            <div className="space-y-3 text-sm text-left">
+              <p className="text-muted-foreground font-medium">Example questions:</p>
+              <div className="space-y-2">
+                <div className="p-3 bg-muted/50 rounded-lg text-muted-foreground border border-border/50 transition-colors hover:bg-muted/70">
+                  &ldquo;Show me emails from last week about the project&rdquo;
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg text-muted-foreground border border-border/50 transition-colors hover:bg-muted/70">
+                  &ldquo;What did John say about the meeting?&rdquo;
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg text-muted-foreground border border-border/50 transition-colors hover:bg-muted/70">
+                  &ldquo;Summarize all emails from my manager this month&rdquo;
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        // Messages List
+        <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
+          {messages.map((message, index) => (
+            <MessageItem
+              key={message.id}
+              message={message}
+              isLast={index === messages.length - 1}
+            />
+          ))}
+          
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="flex justify-start">
+              <div className="max-w-[85%] md:max-w-[70%]">
+                <div className="flex items-center gap-3 p-4 bg-card border border-border/50 rounded-2xl shadow-sm">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Jessie is thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="flex justify-center">
+              <div className="max-w-md p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-center">
+                <p className="text-sm text-destructive mb-2">{error}</p>
+                {onRetry && (
+                  <button
+                    onClick={onRetry}
+                    className="text-xs text-destructive hover:text-destructive/80 underline transition-colors"
+                  >
+                    Try again
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Scroll target */}
+          <div ref={messagesEndRef} />
+        </div>
+      )}
+    </div>
+  );
+}

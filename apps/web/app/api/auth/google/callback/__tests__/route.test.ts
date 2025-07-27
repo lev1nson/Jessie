@@ -3,24 +3,36 @@ import { NextRequest } from 'next/server';
 import { GET } from '../route';
 
 // Mock dependencies
+// Mock Supabase
+const mockExchangeCodeForSession = vi.fn();
+const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+
 vi.mock('@supabase/ssr', () => ({
-  createRouteHandlerClient: vi.fn(() => ({
-    auth: {
-      exchangeCodeForSession: vi.fn(),
-    },
-    from: vi.fn(() => ({
-      upsert: vi.fn(() => ({
-        error: null,
+  createServerClient: vi.fn((url, key, options) => {
+    // Call the cookies methods to ensure they work
+    if (options?.cookies) {
+      options.cookies.getAll();
+      options.cookies.setAll([]);
+    }
+    return {
+      auth: {
+        exchangeCodeForSession: mockExchangeCodeForSession,
+      },
+      from: vi.fn(() => ({
+        upsert: mockUpsert,
       })),
-    })),
-  })),
+    };
+  }),
 }));
 
 vi.mock('next/headers', () => ({
-  cookies: vi.fn(() => ({})),
+  cookies: vi.fn(() => ({
+    getAll: vi.fn(() => []),
+    set: vi.fn(),
+  })),
 }));
 
-vi.mock('../../../../lib/security', () => ({
+vi.mock('@lib/security', () => ({
   checkRateLimit: vi.fn(() => ({ allowed: true, remaining: 9, resetTime: Date.now() + 60000 })),
   getClientIP: vi.fn(() => '127.0.0.1'),
   validateRedirectUrl: vi.fn(() => true),
@@ -31,18 +43,22 @@ vi.mock('../../../../lib/security', () => ({
 }));
 
 beforeEach(() => {
-  process.env.NEXTAUTH_URL = 'http://localhost:3000';
+  vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+  vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+  vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key');
+  vi.clearAllMocks();
 });
 
 afterEach(() => {
   vi.clearAllMocks();
+  vi.unstubAllEnvs();
 });
 
 describe('/api/auth/google/callback', () => {
   describe('GET', () => {
     it('should handle successful OAuth callback', async () => {
-      const { createRouteHandlerClient } = await import('@supabase/ssr');
-      const mockSupabase = createRouteHandlerClient({} as any);
+      const { createServerClient } = await import('@supabase/ssr');
+      const mockSupabase = createServerClient('', '', {} as any);
       
       const mockUser = {
         id: 'user-123',
@@ -68,7 +84,7 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       expect(response.headers.get('location')).toContain('/dashboard');
     });
 
@@ -79,7 +95,7 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       expect(response.headers.get('location')).toContain('/auth/login?error=access_denied');
     });
 
@@ -90,13 +106,13 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       expect(response.headers.get('location')).toContain('/auth/login?error=no_code');
     });
 
     it('should handle session exchange failure', async () => {
-      const { createRouteHandlerClient } = await import('@supabase/ssr');
-      const mockSupabase = createRouteHandlerClient({} as any);
+      const { createServerClient } = await import('@supabase/ssr');
+      const mockSupabase = createServerClient('', '', {} as any);
       
       (mockSupabase.auth.exchangeCodeForSession as any).mockResolvedValue({
         data: null,
@@ -109,15 +125,15 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       expect(response.headers.get('location')).toContain('/auth/login?error=session_failed');
     });
 
     it('should handle user data validation failure', async () => {
-      const { createRouteHandlerClient } = await import('@supabase/ssr');
+      const { createServerClient } = await import('@supabase/ssr');
       const { UserValidationSchema } = await import('@lib/security');
       
-      const mockSupabase = createRouteHandlerClient({} as any);
+      const mockSupabase = createServerClient('', '', {} as any);
       
       const mockUser = {
         id: 'user-123',
@@ -142,7 +158,7 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       expect(response.headers.get('location')).toContain('/auth/login?error=invalid_user_data');
     });
 
@@ -160,15 +176,15 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       expect(response.headers.get('location')).toContain('/auth/login?error=rate_limit');
     });
 
     it('should validate redirect state parameter', async () => {
-      const { createRouteHandlerClient } = await import('@supabase/ssr');
-      const { validateRedirectUrl } = await import('@lib/security');
+      const { createServerClient } = await import('@supabase/ssr');
+      const { validateRedirectUrl, checkRateLimit, UserValidationSchema, secureLog } = await import('@lib/security');
       
-      const mockSupabase = createRouteHandlerClient({} as any);
+      const mockSupabase = createServerClient('', '', {} as any);
       
       const mockUser = {
         id: 'user-123',
@@ -187,6 +203,20 @@ describe('/api/auth/google/callback', () => {
         error: null,
       });
 
+      // Reset rate limit to allow the request
+      (checkRateLimit as any).mockReturnValue({ 
+        allowed: true, 
+        remaining: 9, 
+        resetTime: Date.now() + 60000 
+      });
+      
+      // Mock user validation to pass
+      (UserValidationSchema.parse as any).mockReturnValue(true);
+      
+      // Mock secureLog to capture any errors
+      const mockSecureLog = vi.fn();
+      (secureLog as any).mockImplementation(mockSecureLog);
+      
       (validateRedirectUrl as any).mockReturnValue(false);
 
       const request = new NextRequest(
@@ -195,7 +225,7 @@ describe('/api/auth/google/callback', () => {
 
       const response = await GET(request);
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(307);
       // Should redirect to default dashboard instead of malicious URL
       expect(response.headers.get('location')).toContain('/dashboard');
     });

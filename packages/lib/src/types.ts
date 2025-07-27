@@ -21,6 +21,9 @@ export interface Email {
   body_html: string;
   date_sent: string;
   has_attachments: boolean;
+  is_filtered: boolean;
+  filter_reason: string | null;
+  processed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -70,4 +73,37 @@ export interface SearchResult {
   total: number;
   page: number;
   limit: number;
+}
+
+// Content filtering types
+export interface FilterConfig {
+  id: string;
+  user_id: string;
+  domain_pattern: string;
+  filter_type: 'blacklist' | 'whitelist';
+  created_at: string;
+}
+
+export interface FilterResult {
+  isFiltered: boolean;
+  reason: string | null;
+  confidence: number;
+}
+
+export interface AttachmentInfo {
+  id: string;
+  email_id: string;
+  filename: string;
+  mime_type: string;
+  size: number;
+  google_attachment_id: string;
+  created_at: string;
+}
+
+export interface ParsedAttachment {
+  filename: string;
+  mime_type: string;
+  size: number;
+  content: string;
+  attachment_id: string;
 }

@@ -1,0 +1,289 @@
+import EmbeddingService from '../llm/embeddingService';
+import TextProcessor from '../llm/textProcessor';
+import VectorRepository from '../repositories/vectorRepository';
+import { AttachmentProcessor } from '../parsers/attachmentProcessor';
+
+export interface VectorizationOptions {
+  batchSize?: number;
+  includeAttachments?: boolean;
+  userId?: string;
+}
+
+export interface VectorizationResult {
+  success: boolean;
+  processedCount: number;
+  errorCount: number;
+  errors: Array<{ emailId: string; error: string }>;
+}
+
+export interface EmailContent {
+  id: string;
+  subject: string;
+  body_text: string;
+  attachments?: Array<{
+    id: string;
+    filename: string;
+    mime_type: string;
+    content_text?: string;
+  }>;
+}
+
+/**
+ * Service for vectorizing email content and storing in Supabase
+ */
+export class VectorizationService {
+  private embeddingService: EmbeddingService;
+  private textProcessor: TextProcessor;
+  private vectorRepository: VectorRepository;
+  private attachmentProcessor: AttachmentProcessor;
+
+  constructor(
+    embeddingService?: EmbeddingService,
+    textProcessor?: TextProcessor,
+    vectorRepository?: VectorRepository,
+    attachmentProcessor?: AttachmentProcessor
+  ) {
+    this.embeddingService = embeddingService || new EmbeddingService();
+    this.textProcessor = textProcessor || new TextProcessor();
+    this.vectorRepository = vectorRepository || new VectorRepository();
+    this.attachmentProcessor = attachmentProcessor || new AttachmentProcessor();
+  }
+
+  /**
+   * Vectorize a single email with its content and attachments
+   */
+  async vectorizeEmail(
+    emailContent: EmailContent,
+    options: VectorizationOptions = {}
+  ): Promise<void> {
+    const { includeAttachments = true } = options;
+
+    try {
+      // Check if already vectorized
+      const isVectorized = await this.vectorRepository.isEmailVectorized(emailContent.id);
+      if (isVectorized) {
+        return;
+      }
+
+      // Combine email text
+      let combinedText = this.combineEmailText(emailContent);
+
+      // Process attachments if enabled
+      if (includeAttachments && emailContent.attachments) {
+        const attachmentTexts = await this.processAttachments(emailContent.attachments);
+        if (attachmentTexts.length > 0) {
+          combinedText += '\n\n--- Attachments ---\n' + attachmentTexts.join('\n\n');
+        }
+      }
+
+      // Process and chunk text
+      const processedText = this.textProcessor.cleanText(combinedText);
+      const chunks = this.textProcessor.chunkText(processedText);
+
+      // Generate embedding for the main content
+      const firstChunk = chunks.length > 0 ? chunks[0].content : processedText;
+      const embeddingResponse = await this.embeddingService.generateEmbedding({
+        text: firstChunk
+      });
+      const mainEmbedding = embeddingResponse.embedding;
+
+      // Prepare text chunks metadata
+      const textChunks = {
+        chunks: chunks,
+        totalLength: processedText.length,
+        chunkCount: chunks.length,
+        processedAt: new Date().toISOString(),
+      };
+
+      // Prepare metadata
+      const metadata = {
+        hasAttachments: emailContent.attachments && emailContent.attachments.length > 0,
+        attachmentCount: emailContent.attachments?.length || 0,
+        originalLength: combinedText.length,
+        processedLength: processedText.length,
+        chunkCount: chunks.length,
+      };
+
+      // Save to database
+      await this.vectorRepository.saveEmailEmbedding(
+        emailContent.id,
+        mainEmbedding,
+        textChunks,
+        metadata
+      );
+
+    } catch (error) {
+      throw new Error(`Failed to vectorize email ${emailContent.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Batch vectorize multiple emails
+   */
+  async batchVectorizeEmails(
+    emails: EmailContent[],
+    options: VectorizationOptions = {}
+  ): Promise<VectorizationResult> {
+    const { batchSize = 10 } = options;
+    const result: VectorizationResult = {
+      success: true,
+      processedCount: 0,
+      errorCount: 0,
+      errors: [],
+    };
+
+    // Process in batches
+    for (let i = 0; i < emails.length; i += batchSize) {
+      const batch = emails.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (email) => {
+        try {
+          await this.vectorizeEmail(email, options);
+          result.processedCount++;
+        } catch (error) {
+          result.errorCount++;
+          result.errors.push({
+            emailId: email.id,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      });
+
+      await Promise.allSettled(batchPromises);
+    }
+
+    result.success = result.errorCount === 0;
+    return result;
+  }
+
+  /**
+   * Vectorize emails for a specific user
+   */
+  async vectorizeUserEmails(
+    userId: string,
+    options: VectorizationOptions = {}
+  ): Promise<VectorizationResult> {
+    const { batchSize = 100 } = options;
+
+    try {
+      // Get emails that need vectorization
+      const emails = await this.vectorRepository.getEmailsForVectorization(userId, batchSize);
+      
+      if (emails.length === 0) {
+        return {
+          success: true,
+          processedCount: 0,
+          errorCount: 0,
+          errors: [],
+        };
+      }
+
+      // Convert to EmailContent format
+      const emailContents: EmailContent[] = emails.map(email => ({
+        id: email.id,
+        subject: email.subject || '',
+        body_text: email.body_text || '',
+      }));
+
+      return await this.batchVectorizeEmails(emailContents, { ...options, userId });
+
+    } catch (error) {
+      throw new Error(`Failed to vectorize user emails: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Search for similar emails using semantic search
+   */
+  async searchSimilarEmails(
+    query: string,
+    userId?: string,
+    options: { limit?: number; threshold?: number } = {}
+  ) {
+    const { limit = 10, threshold = 0.7 } = options;
+
+    try {
+      // Process query text
+      const processedQuery = this.textProcessor.cleanText(query);
+      
+      // Generate embedding for query
+      const queryEmbeddingResponse = await this.embeddingService.generateEmbedding({
+        text: processedQuery
+      });
+      const queryEmbedding = queryEmbeddingResponse.embedding;
+
+      // Search similar vectors
+      return await this.vectorRepository.searchSimilarVectors(queryEmbedding, {
+        limit,
+        threshold,
+        userId,
+      });
+
+    } catch (error) {
+      throw new Error(`Failed to search similar emails: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Get vectorization statistics for a user
+   */
+  async getVectorizationStats(userId: string) {
+    return await this.vectorRepository.getVectorizationStats(userId);
+  }
+
+  /**
+   * Combine email subject and body text
+   */
+  private combineEmailText(emailContent: EmailContent): string {
+    const parts: string[] = [];
+
+    if (emailContent.subject?.trim()) {
+      parts.push(`Subject: ${emailContent.subject.trim()}`);
+    }
+
+    if (emailContent.body_text?.trim()) {
+      parts.push(`Body: ${emailContent.body_text.trim()}`);
+    }
+
+    return parts.join('\n\n');
+  }
+
+  /**
+   * Process attachments and extract text content
+   */
+  private async processAttachments(
+    attachments: EmailContent['attachments']
+  ): Promise<string[]> {
+    if (!attachments || attachments.length === 0) {
+      return [];
+    }
+
+    const attachmentTexts: string[] = [];
+
+    for (const attachment of attachments) {
+      try {
+        // If attachment already has extracted text, use it
+        if (attachment.content_text?.trim()) {
+          attachmentTexts.push(`${attachment.filename}: ${attachment.content_text.trim()}`);
+          continue;
+        }
+
+        // Skip if no content to process
+        if (!attachment.mime_type) {
+          continue;
+        }
+
+        // For now, we'll rely on pre-extracted content
+        // In a full implementation, you might want to process attachments here
+        
+      } catch (error) {
+        // Log error but continue processing other attachments
+        console.warn(`Failed to process attachment ${attachment.filename}:`, error);
+      }
+    }
+
+    return attachmentTexts;
+  }
+}
+
+export default VectorizationService;

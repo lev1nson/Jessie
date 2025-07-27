@@ -1,0 +1,337 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { NextRequest } from 'next/server';
+import { GET } from '../route';
+import { createServiceSupabase } from '@jessie/lib';
+import { GmailService } from '@lib/gmail/service';
+import { EmailRepository } from '@lib/repositories/emailRepository';
+
+// Мокаем зависимости
+vi.mock('@jessie/lib', () => ({
+  createServiceSupabase: vi.fn()
+}));
+vi.mock('@lib/gmail/service');
+vi.mock('@lib/repositories/emailRepository');
+
+describe('/api/cron/email-sync', () => {
+  let mockSupabase: any;
+  let mockGmailService: any;
+  let mockEmailRepository: any;
+
+  const createQueryChainMock = (result: any) => {
+    // Final .not() call that returns the promise with result
+    const secondNotMock = vi.fn().mockResolvedValue(result);
+    
+    // First .not() call that returns an object with the second .not() method
+    const firstNotMock = {
+      not: secondNotMock,
+    };
+    
+    // .select() call that returns an object with the first .not() method
+    const selectMock = {
+      not: vi.fn().mockReturnValue(firstNotMock),
+    };
+    
+    const fromMock = {
+      select: vi.fn().mockReturnValue(selectMock),
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      }),
+    };
+    
+    return fromMock;
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    // Default mock users data
+    const mockUsers = [
+      {
+        id: 'user1',
+        email: 'user1@example.com',
+        google_access_token: 'token1',
+        google_refresh_token: 'refresh1',
+        google_token_expires_at: new Date(Date.now() + 3600000).toISOString(),
+      },
+      {
+        id: 'user2',
+        email: 'user2@example.com',
+        google_access_token: 'token2',
+        google_refresh_token: 'refresh2',
+        google_token_expires_at: new Date(Date.now() + 3600000).toISOString(),
+      },
+    ];
+
+    // Set up default successful mock
+    const defaultResult = {
+      data: mockUsers,
+      error: null,
+    };
+
+    mockSupabase = {
+      from: vi.fn().mockReturnValue(createQueryChainMock(defaultResult)),
+    };
+    (createServiceSupabase as any).mockReturnValue(mockSupabase);
+
+    // Мокаем GmailService
+    mockGmailService = {
+      initialize: vi.fn(),
+      fetchNewEmails: vi.fn(),
+      refreshCredentials: vi.fn(),
+    };
+
+    (GmailService as any).mockImplementation(() => mockGmailService);
+
+    // Мокаем EmailRepository
+    mockEmailRepository = {
+      getLastEmailDate: vi.fn(),
+      filterNewEmails: vi.fn(),
+      saveEmailsBatch: vi.fn(),
+    };
+
+    (EmailRepository as any).mockImplementation(() => mockEmailRepository);
+
+    // Temporarily disable console mocking to see errors
+    // vi.spyOn(console, 'log').mockImplementation(() => {});
+    // vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe('GET', () => {
+    it('should process emails for users with Google tokens', async () => {
+      const mockEmails = [
+        {
+          google_message_id: 'msg1',
+          subject: 'Test Email 1',
+          sender: 'sender1@example.com',
+          recipient: 'user1@example.com',
+          body_text: 'Test body 1',
+          body_html: '<p>Test body 1</p>',
+          date_sent: '2024-01-01T00:00:00.000Z',
+          thread_id: 'thread1',
+          has_attachments: false,
+        },
+      ];
+
+      // Мокаем Gmail сервис
+      mockGmailService.initialize.mockResolvedValue(undefined);
+      mockGmailService.fetchNewEmails.mockResolvedValue(mockEmails);
+
+      // Мокаем Email Repository
+      mockEmailRepository.getLastEmailDate.mockResolvedValue(new Date('2024-01-01'));
+      mockEmailRepository.filterNewEmails.mockResolvedValue(mockEmails);
+      mockEmailRepository.saveEmailsBatch.mockResolvedValue(mockEmails);
+
+      const request = new NextRequest('http://localhost:3000/api/cron/email-sync', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+      });
+
+      const response = await GET(request);
+      const result = await response.json();
+
+      if (response.status !== 200) {
+        console.log('Response status:', response.status);
+        console.log('Response body:', result);
+      }
+
+      expect(response.status).toBe(200);
+      expect(result.processedUsers).toBe(2);
+      expect(mockGmailService.initialize).toHaveBeenCalledTimes(2);
+      expect(mockEmailRepository.saveEmailsBatch).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle authentication errors and refresh tokens', async () => {
+      const mockUser = {
+        id: 'user1',
+        email: 'user1@example.com',
+        google_access_token: 'expired_token',
+        google_refresh_token: 'refresh_token',
+      };
+
+      const newCredentials = {
+        access_token: 'new_token',
+        refresh_token: 'new_refresh',
+      };
+
+      // Override the default mock for this test
+      const testResult = {
+        data: [mockUser],
+        error: null,
+      };
+      
+      const queryChainMock = createQueryChainMock(testResult);
+      mockSupabase.from.mockReturnValue(queryChainMock);
+
+      // Первая попытка инициализации не удается с invalid_grant ошибкой
+      mockGmailService.initialize.mockRejectedValueOnce(
+        new Error('invalid_grant')
+      );
+
+      // Обновление токенов успешно
+      mockGmailService.refreshCredentials.mockResolvedValue(newCredentials);
+
+      // Вторая попытка инициализации успешна
+      mockGmailService.initialize.mockResolvedValueOnce(undefined);
+      mockGmailService.fetchNewEmails.mockResolvedValue([]);
+
+      mockEmailRepository.getLastEmailDate.mockResolvedValue(null);
+      mockEmailRepository.filterNewEmails.mockResolvedValue([]);
+
+      const request = new NextRequest('http://localhost:3000/api/cron/email-sync', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+      });
+
+      const response = await GET(request);
+      await response.json();
+
+      expect(response.status).toBe(200);
+      expect(mockGmailService.refreshCredentials).toHaveBeenCalled();
+      expect(queryChainMock.update).toHaveBeenCalledWith({
+        google_access_token: 'new_token',
+        google_refresh_token: 'new_refresh',
+        google_token_expiry: null,
+      });
+    });
+
+    it('should skip users with failed token refresh', async () => {
+      const mockUser = {
+        id: 'user1',
+        email: 'user1@example.com',
+        google_access_token: 'expired_token',
+        google_refresh_token: 'invalid_refresh',
+      };
+
+      // Override the default mock for this test
+      const testResult = {
+        data: [mockUser],
+        error: null,
+      };
+      
+      const queryChainMock = createQueryChainMock(testResult);
+      mockSupabase.from.mockReturnValue(queryChainMock);
+
+      // Инициализация не удается
+      mockGmailService.initialize.mockRejectedValue(
+        new Error('Invalid credentials')
+      );
+
+      // Обновление токенов не удается
+      mockGmailService.refreshCredentials.mockRejectedValue(
+        new Error('Invalid refresh token')
+      );
+
+      const request = new NextRequest('http://localhost:3000/api/cron/email-sync', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+      });
+
+      const response = await GET(request);
+      const result = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(result.processedUsers).toBe(0);
+      expect(result.errors).toHaveLength(1);
+    });
+
+    it('should handle database errors gracefully', async () => {
+      // Override the default mock for this test to simulate database error
+      const testResult = {
+        data: null,
+        error: { message: 'Database connection error' },
+      };
+      
+      const queryChainMock = createQueryChainMock(testResult);
+      mockSupabase.from.mockReturnValue(queryChainMock);
+
+      const request = new NextRequest('http://localhost:3000/api/cron/email-sync', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+      });
+
+      const response = await GET(request);
+      const result = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(result.error).toBe('Failed to fetch users');
+    });
+
+    it('should filter out existing emails', async () => {
+      const mockUser = {
+        id: 'user1',
+        email: 'user1@example.com',
+        google_access_token: 'token1',
+        google_refresh_token: 'refresh1',
+      };
+
+      const fetchedEmails = [
+        {
+          google_message_id: 'msg1',
+          subject: 'New Email',
+          sender: 'sender@example.com',
+          recipient: 'user1@example.com',
+          body_text: 'New email body',
+          body_html: '<p>New email body</p>',
+          date_sent: '2024-01-01T00:00:00.000Z',
+          thread_id: 'thread1',
+          has_attachments: false,
+        },
+        {
+          google_message_id: 'msg2',
+          subject: 'Existing Email',
+          sender: 'sender@example.com',
+          recipient: 'user1@example.com',
+          body_text: 'Existing email body',
+          body_html: '<p>Existing email body</p>',
+          date_sent: '2024-01-01T01:00:00.000Z',
+          thread_id: 'thread2',
+          has_attachments: false,
+        },
+      ];
+
+      const newEmails = [fetchedEmails[0]]; // Только первое письмо новое
+
+      // Override the default mock for this test
+      const testResult = {
+        data: [mockUser],
+        error: null,
+      };
+      
+      const queryChainMock = createQueryChainMock(testResult);
+      mockSupabase.from.mockReturnValue(queryChainMock);
+
+      mockGmailService.initialize.mockResolvedValue(undefined);
+      mockGmailService.fetchNewEmails.mockResolvedValue(fetchedEmails);
+
+      mockEmailRepository.getLastEmailDate.mockResolvedValue(new Date('2024-01-01'));
+      mockEmailRepository.filterNewEmails.mockResolvedValue(newEmails);
+      mockEmailRepository.saveEmailsBatch.mockResolvedValue(newEmails);
+
+      const request = new NextRequest('http://localhost:3000/api/cron/email-sync', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+      });
+
+      const response = await GET(request);
+      await response.json();
+
+      expect(response.status).toBe(200);
+      expect(mockEmailRepository.filterNewEmails).toHaveBeenCalledWith(fetchedEmails);
+      expect(mockEmailRepository.saveEmailsBatch).toHaveBeenCalledWith('user1', newEmails);
+    });
+  });
+});

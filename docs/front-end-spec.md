@@ -86,7 +86,7 @@ graph TD
 
 #### **Файлы с дизайном (Design Files)**
 
-* **Основное хранилище макетов**: [Jessie Chat Interface \- Figma](https://www.google.com/search?q=https://www.figma.com/community/file/1390998859129424296)  
+* **Основное хранилище макетов**: [Jessie Chat Interface \- Figma](https://www.figma.com/make/qa3ZJk0VWrq43fG5WK7hxU/%D0%98%D0%BD%D1%82%D0%B5%D1%80%D1%84%D0%B5%D0%B9%D1%81-%D1%87%D0%B0%D1%82%D0%B0-%D1%81-Jessie?t=fTzWaOmaAygi370D-1)  
 * **Важное замечание**: Предоставленный макет в Figma служит основной **визуальной и стилистической основой** для MVP и не является полной спецификацией. Для детальной реализации функциональности следует руководствоваться данным документом.
 
 #### **Структура ключевых экранов (Key Screen Layouts)**

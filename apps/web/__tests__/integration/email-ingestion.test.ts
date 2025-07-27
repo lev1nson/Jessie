@@ -1,0 +1,315 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { GmailService } from '@lib/gmail/service';
+import { EmailRepository } from '@lib/repositories/emailRepository';
+import { createServiceSupabase } from '@jessie/lib';
+
+// Мокаем внешние зависимости
+vi.mock('@jessie/lib', () => ({
+  createServiceSupabase: vi.fn()
+}));
+vi.mock('googleapis');
+
+describe('Email Ingestion Integration Tests', () => {
+  let gmailService: GmailService;
+  let emailRepository: EmailRepository;
+  let mockSupabase: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    // Создаем базовый mock для каждого теста
+    mockSupabase = {
+      from: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      range: vi.fn().mockReturnThis(),
+      count: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      single: vi.fn(),
+      not: vi.fn().mockReturnThis(),
+      is: vi.fn().mockReturnThis(),
+    };
+
+    (createServiceSupabase as any).mockReturnValue(mockSupabase);
+
+    gmailService = new GmailService();
+    emailRepository = new EmailRepository();
+
+    // Мокаем console методы
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe('End-to-End Email Processing', () => {
+    it('should process emails from Gmail to database successfully', async () => {
+      const userId = 'test-user-123';
+      const credentials = {
+        access_token: 'test-access-token',
+        refresh_token: 'test-refresh-token',
+      };
+
+      // Мокаем Gmail API ответы
+      const mockGmailMessages = [
+        {
+          id: 'msg1',
+          threadId: 'thread1',
+          internalDate: '1704067200000', // 2024-01-01
+          payload: {
+            headers: [
+              { name: 'Subject', value: 'Test Email 1' },
+              { name: 'From', value: 'sender1@example.com' },
+              { name: 'To', value: 'recipient@example.com' },
+            ],
+            body: {
+              data: Buffer.from('Test email body 1').toString('base64'),
+            },
+            mimeType: 'text/plain',
+          },
+        },
+        {
+          id: 'msg2',
+          threadId: 'thread2',
+          internalDate: '1704070800000', // 2024-01-01 01:00:00
+          payload: {
+            headers: [
+              { name: 'Subject', value: 'Test Email 2' },
+              { name: 'From', value: 'sender2@example.com' },
+              { name: 'To', value: 'recipient@example.com' },
+            ],
+            body: {
+              data: Buffer.from('Test email body 2').toString('base64'),
+            },
+            mimeType: 'text/plain',
+          },
+        },
+      ];
+
+      // Мокаем Gmail клиент
+      const mockGmailClient = {
+        setCredentials: vi.fn(),
+        validateCredentials: vi.fn().mockResolvedValue(true),
+        getMessagesAfter: vi.fn().mockResolvedValue([
+          { id: 'msg1', threadId: 'thread1' },
+          { id: 'msg2', threadId: 'thread2' },
+        ]),
+        getMessage: vi.fn()
+          .mockResolvedValueOnce(mockGmailMessages[0])
+          .mockResolvedValueOnce(mockGmailMessages[1]),
+      };
+
+      // Заменяем Gmail клиент в сервисе
+      (gmailService as any).client = mockGmailClient;
+
+      // Настраиваем мокинг для цепочки методов Supabase
+      
+      // 1. getLastEmailDate: single() для получения последней даты
+      mockSupabase.single.mockImplementation(() => 
+        Promise.resolve({ data: null, error: { code: 'PGRST116' } })
+      );
+      
+      // 2. filterNewEmails: обычный select для проверки существующих писем
+      let selectCallCount = 0;
+      mockSupabase.select.mockImplementation(() => {
+        selectCallCount++;
+        if (selectCallCount === 1) {
+          // Первый вызов - filterNewEmails, возвращаем пустой массив (нет существующих)
+          return Promise.resolve({ data: [], error: null });
+        } else {
+          // Последующие вызовы - saveEmail с select(), возвращаем сохраненные данные
+          return {
+            single: () => Promise.resolve({ 
+              data: { 
+                id: `email${selectCallCount-1}`, 
+                user_id: userId,
+                google_message_id: `msg${selectCallCount-1}`,
+                subject: `Test Email ${selectCallCount-1}`
+              }, 
+              error: null 
+            })
+          };
+        }
+      });
+
+      // Инициализируем Gmail сервис
+      await gmailService.initialize(credentials);
+
+      // Получаем последнюю дату письма (должна быть null для нового пользователя)
+      const lastEmailDate = await emailRepository.getLastEmailDate(userId);
+      expect(lastEmailDate).toBeNull();
+
+      // Устанавливаем дату 30 дней назад для первого запуска
+      const afterDate = new Date();
+      afterDate.setDate(afterDate.getDate() - 30);
+
+      // Получаем новые письма из Gmail
+      const newEmails = await gmailService.fetchNewEmails(afterDate, ['INBOX']);
+      expect(newEmails).toHaveLength(2);
+
+      // Проверяем структуру полученных писем
+      expect(newEmails[0]).toMatchObject({
+        google_message_id: 'msg1',
+        thread_id: 'thread1',
+        subject: 'Test Email 1',
+        sender: 'sender1@example.com',
+        recipient: 'recipient@example.com',
+        body_text: 'Test email body 1',
+        has_attachments: false,
+      });
+
+      // Фильтруем новые письма (все должны быть новыми)
+      const filteredEmails = await emailRepository.filterNewEmails(newEmails);
+      expect(filteredEmails).toHaveLength(2);
+
+      // Сохраняем письма по одному (так как у нас нет batch метода в моке)
+      for (const email of filteredEmails) {
+        const savedEmail = await emailRepository.saveEmail(userId, email);
+        expect(savedEmail).toBeTruthy();
+      }
+
+      // Проверяем, что все методы были вызваны правильно
+      expect(mockGmailClient.setCredentials).toHaveBeenCalledWith(credentials);
+      expect(mockGmailClient.validateCredentials).toHaveBeenCalled();
+      expect(mockGmailClient.getMessagesAfter).toHaveBeenCalledWith(
+        afterDate,
+        ['INBOX'],
+        100
+      );
+      expect(mockGmailClient.getMessage).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle duplicate emails correctly', async () => {
+      const emails = [
+        {
+          google_message_id: 'msg1',
+          thread_id: 'thread1',
+          subject: 'Test Email 1',
+          sender: 'sender1@example.com',
+          recipient: 'recipient@example.com',
+          body_text: 'Test body 1',
+          body_html: '<p>Test body 1</p>',
+          date_sent: '2024-01-01T00:00:00.000Z',
+          has_attachments: false,
+        },
+        {
+          google_message_id: 'msg2',
+          thread_id: 'thread2',
+          subject: 'Test Email 2',
+          sender: 'sender2@example.com',
+          recipient: 'recipient@example.com',
+          body_text: 'Test body 2',
+          body_html: '<p>Test body 2</p>',
+          date_sent: '2024-01-01T01:00:00.000Z',
+          has_attachments: false,
+        },
+      ];
+
+      // Используем существующий mockSupabase, но переопределяем поведение .in()
+      mockSupabase.in.mockResolvedValue({
+        data: [{ google_message_id: 'msg1' }], // msg1 уже существует в базе
+        error: null,
+      });
+
+      const filteredEmails = await emailRepository.filterNewEmails(emails);
+
+      // Должно остаться только одно новое письмо (msg2)
+      expect(filteredEmails).toHaveLength(1);
+      expect(filteredEmails[0].google_message_id).toBe('msg2');
+    });
+
+    it('should handle Gmail API errors gracefully', async () => {
+      const credentials = {
+        access_token: 'invalid-token',
+        refresh_token: 'test-refresh-token',
+      };
+
+      const mockGmailClient = {
+        setCredentials: vi.fn(),
+        validateCredentials: vi.fn().mockResolvedValue(false),
+        refreshAccessToken: vi.fn().mockResolvedValue({
+          access_token: 'new-token',
+          refresh_token: 'new-refresh-token',
+        }),
+      };
+
+      (gmailService as any).client = mockGmailClient;
+
+      // Инициализация должна обновить токены
+      await gmailService.initialize(credentials);
+
+      expect(mockGmailClient.validateCredentials).toHaveBeenCalled();
+      expect(mockGmailClient.refreshAccessToken).toHaveBeenCalled();
+      expect(mockGmailClient.setCredentials).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle database errors gracefully', async () => {
+      const userId = 'test-user-123';
+      const email = {
+        google_message_id: 'msg1',
+        thread_id: 'thread1',
+        subject: 'Test Email',
+        sender: 'sender@example.com',
+        recipient: 'recipient@example.com',
+        body_text: 'Test body',
+        body_html: '<p>Test body</p>',
+        date_sent: '2024-01-01T00:00:00.000Z',
+        has_attachments: false,
+      };
+
+      // Мокаем ошибку базы данных
+      mockSupabase.single.mockResolvedValue({
+        data: null,
+        error: { message: 'Database connection error' },
+      });
+
+      const result = await emailRepository.saveEmail(userId, email);
+
+      // Метод должен вернуть null при ошибке
+      expect(result).toBeNull();
+    });
+
+    it('should process large batches of emails efficiently', async () => {
+      const userId = 'test-user-123';
+      
+      // Создаем большой массив писем
+      const emails = Array.from({ length: 100 }, (_, i) => ({
+        google_message_id: `msg${i + 1}`,
+        thread_id: `thread${i + 1}`,
+        subject: `Test Email ${i + 1}`,
+        sender: `sender${i + 1}@example.com`,
+        recipient: 'recipient@example.com',
+        body_text: `Test body ${i + 1}`,
+        body_html: `<p>Test body ${i + 1}</p>`,
+        date_sent: new Date(2024, 0, 1, i % 24).toISOString(),
+        has_attachments: false,
+      }));
+
+      // Мокаем что все письма новые
+      mockSupabase.select.mockResolvedValue({
+        data: [],
+        error: null,
+      });
+
+      // Мокаем успешное сохранение batch
+      mockSupabase.select.mockResolvedValue({
+        data: emails.map((email, i) => ({ id: i + 1, user_id: userId, ...email })),
+        error: null,
+      });
+
+      const filteredEmails = await emailRepository.filterNewEmails(emails);
+      expect(filteredEmails).toHaveLength(100);
+
+      const savedEmails = await emailRepository.saveEmailsBatch(userId, filteredEmails);
+      expect(savedEmails).toHaveLength(100);
+
+      // Проверяем что batch операция была вызвана один раз
+      expect(mockSupabase.insert).toHaveBeenCalledTimes(1);
+    });
+  });
+});

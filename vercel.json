@@ -20,5 +20,11 @@
     "apps/web/app/api/**": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/email-sync",
+      "schedule": "0 * * * *"
+    }
+  ]
 }

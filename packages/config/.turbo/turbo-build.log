@@ -2,3 +2,102 @@
 > @jessie/config@1.0.0 build
 > tsc
 
+../../apps/web/__tests__/integration/email-ingestion.test.ts(2,30): error TS2307: Cannot find module '@lib/gmail/service' or its corresponding type declarations.
+../../apps/web/__tests__/integration/email-ingestion.test.ts(3,33): error TS2307: Cannot find module '@lib/repositories/emailRepository' or its corresponding type declarations.
+../../apps/web/__tests__/integration/oauth-flow.test.ts(58,69): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/__tests__/integration/oauth-flow.test.ts(150,47): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/__tests__/integration/oauth-flow.test.ts(181,47): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/callback/__tests__/route.test.ts(134,53): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/callback/__tests__/route.test.ts(166,47): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/callback/__tests__/route.test.ts(185,101): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/callback/route.ts(10,8): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/login/__tests__/route.test.ts(63,88): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/login/__tests__/route.test.ts(113,52): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/login/__tests__/route.test.ts(132,47): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/auth/google/login/route.ts(10,8): error TS2307: Cannot find module '@lib/security' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(5,30): error TS2307: Cannot find module '@lib/gmail/service' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(6,33): error TS2307: Cannot find module '@lib/repositories/emailRepository' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(140,39): error TS2304: Cannot find name 'result'.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(144,14): error TS2304: Cannot find name 'result'.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(243,14): error TS2304: Cannot find name 'result'.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(244,14): error TS2304: Cannot find name 'result'.
+../../apps/web/app/api/cron/email-sync/__tests__/route.test.ts(268,14): error TS2304: Cannot find name 'result'.
+../../apps/web/app/api/cron/email-sync/route.ts(3,30): error TS2307: Cannot find module '@lib/gmail/service' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/route.ts(4,33): error TS2307: Cannot find module '@lib/repositories/emailRepository' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/route.ts(5,40): error TS2307: Cannot find module '@lib/repositories/filterConfigRepository' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/route.ts(6,29): error TS2307: Cannot find module '@lib/filters/emailFilter' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/route.ts(7,28): error TS2307: Cannot find module '@lib/parsers/htmlParser' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/route.ts(8,37): error TS2307: Cannot find module '@lib/parsers/attachmentProcessor' or its corresponding type declarations.
+../../apps/web/app/api/cron/email-sync/route.ts(153,33): error TS7006: Parameter 'email' implicitly has an 'any' type.
+../../apps/web/app/api/cron/email-sync/route.ts(179,27): error TS7006: Parameter 'data' implicitly has an 'any' type.
+../../apps/web/app/api/cron/email-sync/route.ts(180,24): error TS7006: Parameter 'data' implicitly has an 'any' type.
+../../apps/web/app/api/cron/email-sync/route.ts(188,28): error TS7006: Parameter 'attachment' implicitly has an 'any' type.
+../../apps/web/app/dashboard/page.tsx(3,28): error TS2307: Cannot find module '@/components/features/chat/ChatLayout' or its corresponding type declarations.
+../../apps/web/app/dashboard/page.tsx(4,31): error TS2307: Cannot find module '@/components/features/chat/ChatInterface' or its corresponding type declarations.
+../../apps/web/components/features/chat/ChatInterface.tsx(4,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
+../../apps/web/components/features/chat/ChatInterface.tsx(5,23): error TS2307: Cannot find module '@/components/ui/input' or its corresponding type declarations.
+../../apps/web/components/features/chat/ChatInterface.tsx(6,22): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
+../../apps/web/components/features/chat/ChatInterface.tsx(98,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+../../apps/web/components/ui/button.tsx(5,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+../../apps/web/components/ui/card.tsx(3,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+../../apps/web/components/ui/input.tsx(3,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+../../apps/web/lib/__tests__/setup.ts(45,15): error TS2540: Cannot assign to 'NODE_ENV' because it is a read-only property.
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(45,5): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(52,5): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(85,9): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(91,9): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(131,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(143,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(158,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(202,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(244,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(300,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/__tests__/attachmentProcessor.test.ts(307,13): error TS2739: Type '{ id: string; filename: string; mime_type: string; size: number; }' is missing the following properties from type 'AttachmentInfo': email_id, google_attachment_id, created_at
+../../apps/web/lib/parsers/docxParser.ts(37,49): error TS2345: Argument of type '(image: any) => { src: string; }' is not assignable to parameter of type '(image: Image) => Promise<ImageAttributes>'.
+  Type '{ src: string; }' is missing the following properties from type 'Promise<ImageAttributes>': then, catch, finally, [Symbol.toStringTag]
+../../apps/web/lib/parsers/docxParser.ts(46,63): error TS2554: Expected 1 arguments, but got 2.
+../../apps/web/lib/parsers/docxParser.ts(49,54): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'Input'.
+  Type 'Buffer<ArrayBufferLike>' is not assignable to type 'BufferInput'.
+    Types of property 'buffer' are incompatible.
+      Type 'ArrayBufferLike' is not assignable to type 'Buffer<ArrayBufferLike>'.
+        Type 'ArrayBuffer' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 94 more.
+../../apps/web/lib/parsers/docxParser.ts(185,54): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'Input'.
+  Type 'Buffer<ArrayBufferLike>' is not assignable to type 'BufferInput'.
+    Types of property 'buffer' are incompatible.
+      Type 'ArrayBufferLike' is not assignable to type 'Buffer<ArrayBufferLike>'.
+        Type 'ArrayBuffer' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 94 more.
+../../apps/web/lib/parsers/docxParser.ts(236,23): error TS2345: Argument of type 'string[][]' is not assignable to parameter of type 'string[]'.
+  Type 'string[]' is not assignable to type 'string'.
+../../apps/web/lib/parsers/htmlParser.ts(22,9): error TS2353: Object literal may only specify known properties, and 'decodeEntities' does not exist in type 'CheerioOptions'.
+../../apps/web/lib/parsers/htmlParser.ts(39,48): error TS2554: Expected 1 arguments, but got 2.
+../../apps/web/lib/parsers/pdfParser.ts(1,17): error TS7016: Could not find a declaration file for module 'pdf-parse'. '/Users/max/Documents/Coding/Jessie/node_modules/pdf-parse/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pdf-parse` if it exists or add a new declaration (.d.ts) file containing `declare module 'pdf-parse';`
+../../apps/web/lib/repositories/__tests__/vectorRepository.test.ts(51,69): error TS2345: Argument of type '{ chunks: string[]; }' is not assignable to parameter of type 'TextChunks'.
+  Type '{ chunks: string[]; }' is missing the following properties from type 'TextChunks': totalLength, chunkCount, processedAt
+../../apps/web/lib/repositories/__tests__/vectorRepository.test.ts(77,65): error TS2345: Argument of type '{ chunks: string[]; }' is not assignable to parameter of type 'TextChunks'.
+  Type '{ chunks: string[]; }' is missing the following properties from type 'TextChunks': totalLength, chunkCount, processedAt
+../../apps/web/lib/repositories/__tests__/vectorRepository.test.ts(105,50): error TS2345: Argument of type '{ id: string; embedding: number[]; text_chunks: { chunks: string[]; }; metadata: { test: string; }; }[]' is not assignable to parameter of type 'VectorData[]'.
+  Type '{ id: string; embedding: number[]; text_chunks: { chunks: string[]; }; metadata: { test: string; }; }' is not assignable to type 'VectorData'.
+    Types of property 'text_chunks' are incompatible.
+      Type '{ chunks: string[]; }' is missing the following properties from type 'TextChunks': totalLength, chunkCount, processedAt
+../../apps/web/lib/repositories/__tests__/vectorRepository.test.ts(141,57): error TS2345: Argument of type '{ id: string; embedding: number[]; text_chunks: { chunks: string[]; }; }[]' is not assignable to parameter of type 'VectorData[]'.
+  Type '{ id: string; embedding: number[]; text_chunks: { chunks: string[]; }; }' is not assignable to type 'VectorData'.
+    Types of property 'text_chunks' are incompatible.
+      Type '{ chunks: string[]; }' is missing the following properties from type 'TextChunks': totalLength, chunkCount, processedAt
+../../apps/web/lib/services/asyncAttachmentProcessor.ts(233,25): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+../../apps/web/lib/services/vectorizationService.ts(102,79): error TS2345: Argument of type 'TextChunk[]' is not assignable to parameter of type '{ content: string; index: number; size: number; }[]'.
+  Property 'size' is missing in type 'TextChunk' but required in type '{ content: string; index: number; size: number; }'.
+../../apps/web/lib/services/vectorizationService.ts(107,77): error TS2345: Argument of type 'TextChunk[]' is not assignable to parameter of type '{ content: string; index: number; size: number; }[]'.
+  Property 'size' is missing in type 'TextChunk' but required in type '{ content: string; index: number; size: number; }'.
+../../apps/web/lib/services/vectorizationService.ts(336,7): error TS2322: Type '{ hasAttachments: boolean | undefined; attachmentCount: number; originalLength: number; processedLength: number; chunkCount: number; }' is not assignable to type 'VectorMetadata'.
+  Types of property 'hasAttachments' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+../../apps/web/lib/types.ts(15,8): error TS2307: Cannot find module '@packages/lib' or its corresponding type declarations.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/max/Documents/Coding/Jessie/packages/config
+npm error workspace @jessie/config@1.0.0
+npm error location /Users/max/Documents/Coding/Jessie/packages/config
+npm error command failed
+npm error command sh -c tsc

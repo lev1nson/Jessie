@@ -2,20 +2,35 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 
-// Mock dependencies
+// Create mock functions that can be controlled per test
+const mockSignInWithOAuth = vi.fn();
+const mockCookiesGetAll = vi.fn();
+const mockCookiesSet = vi.fn();
+
+// Mock dependencies with proper factory functions
 vi.mock('@supabase/ssr', () => ({
-  createRouteHandlerClient: vi.fn(() => ({
-    auth: {
-      signInWithOAuth: vi.fn(),
-    },
-  })),
+  createServerClient: vi.fn((url, key, options) => {
+    // Call the cookies methods to ensure they work
+    if (options?.cookies) {
+      options.cookies.getAll();
+      options.cookies.setAll([]);
+    }
+    return {
+      auth: {
+        signInWithOAuth: mockSignInWithOAuth,
+      },
+    };
+  }),
 }));
 
 vi.mock('next/headers', () => ({
-  cookies: vi.fn(() => ({})),
+  cookies: vi.fn(() => ({
+    getAll: mockCookiesGetAll,
+    set: mockCookiesSet,
+  })),
 }));
 
-vi.mock('../../../../lib/security', () => ({
+vi.mock('@lib/security', () => ({
   checkRateLimit: vi.fn(() => ({ allowed: true, remaining: 4, resetTime: Date.now() + 60000 })),
   getClientIP: vi.fn(() => '127.0.0.1'),
   validateRedirectUrl: vi.fn(() => true),
@@ -24,24 +39,45 @@ vi.mock('../../../../lib/security', () => ({
 }));
 
 // Mock environment variables
-beforeEach(() => {
-  process.env.NEXTAUTH_URL = 'http://localhost:3000';
-  process.env.GOOGLE_CLIENT_ID = 'test-client-id';
-  process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret';
+beforeEach(async () => {
+  vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+  vi.stubEnv('GOOGLE_CLIENT_ID', 'test-client-id');
+  vi.stubEnv('GOOGLE_CLIENT_SECRET', 'test-client-secret');
+  vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'http://localhost:54321');
+  vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key');
+  vi.stubEnv('NODE_ENV', 'test');
+  
+  // Reset all mocks to default values
+  vi.clearAllMocks();
+  
+  // Set up default mock implementations
+  mockSignInWithOAuth.mockResolvedValue({
+    data: { url: 'https://accounts.google.com/oauth/authorize?...' },
+    error: null,
+  });
+  
+  mockCookiesGetAll.mockReturnValue([]);
+  mockCookiesSet.mockImplementation(() => {});
+  
+  // Reset security mocks to default values
+  const { checkRateLimit, validateRedirectUrl, getClientIP, secureLog } = await import('@lib/security');
+  (checkRateLimit as any).mockReturnValue({ allowed: true, remaining: 4, resetTime: Date.now() + 60000 });
+  (validateRedirectUrl as any).mockReturnValue(true);
+  (getClientIP as any).mockReturnValue('127.0.0.1');
+  (secureLog as any).mockImplementation(() => {});
 });
 
 afterEach(() => {
   vi.clearAllMocks();
+  vi.unstubAllEnvs();
 });
 
 describe('/api/auth/google/login', () => {
   describe('POST', () => {
     it('should initiate OAuth flow successfully', async () => {
-      const { createRouteHandlerClient } = await import('@supabase/ssr');
-      const mockSupabase = createRouteHandlerClient({} as any);
-      
-      (mockSupabase.auth.signInWithOAuth as any).mockResolvedValue({
-        data: { url: 'https://accounts.google.com/oauth/authorize?...' },
+      // Mock successful OAuth response
+      mockSignInWithOAuth.mockResolvedValue({
+        data: { url: 'https://accounts.google.com/oauth/authorize?client_id=test&redirect_uri=callback' },
         error: null,
       });
 
@@ -59,6 +95,18 @@ describe('/api/auth/google/login', () => {
       expect(response.status).toBe(200);
       expect(data).toHaveProperty('url');
       expect(data.url).toContain('accounts.google.com');
+      expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+        provider: 'google',
+        options: {
+          scopes: 'email profile https://www.googleapis.com/auth/gmail.readonly',
+          redirectTo: 'http://localhost:3000/api/auth/google/callback',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+            state: encodeURIComponent('http://localhost:3000/dashboard'),
+          },
+        },
+      });
     });
 
     it('should handle invalid redirect URL', async () => {
@@ -104,10 +152,8 @@ describe('/api/auth/google/login', () => {
     });
 
     it('should handle OAuth initiation failure', async () => {
-      const { createRouteHandlerClient } = await import('@supabase/ssr');
-      const mockSupabase = createRouteHandlerClient({} as any);
-      
-      (mockSupabase.auth.signInWithOAuth as any).mockResolvedValue({
+      // Mock OAuth failure
+      mockSignInWithOAuth.mockResolvedValue({
         data: null,
         error: { message: 'OAuth failed' },
       });

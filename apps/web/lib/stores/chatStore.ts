@@ -1,0 +1,305 @@
+'use client';
+
+import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
+import { Chat, Message, ChatState, CreateChatRequest, SendMessageRequest } from '../types/chat';
+
+interface ChatActions {
+  // Chat management
+  loadChats: () => Promise<void>;
+  createChat: (request: CreateChatRequest) => Promise<string>;
+  selectChat: (chatId: string) => Promise<void>;
+  updateChatTitle: (chatId: string, title: string) => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
+  
+  // Message management
+  loadMessages: (chatId: string) => Promise<void>;
+  sendMessage: (request: SendMessageRequest) => Promise<void>;
+  
+  // UI state management
+  clearError: (type: 'chats' | 'messages' | 'sending') => void;
+  reset: () => void;
+}
+
+type ChatStore = ChatState & ChatActions;
+
+const initialState: ChatState = {
+  chats: [],
+  currentChat: null,
+  messages: [],
+  loading: {
+    chats: false,
+    messages: false,
+    sending: false,
+  },
+  error: {
+    chats: null,
+    messages: null,
+    sending: null,
+  },
+};
+
+export const useChatStore = create<ChatStore>()(
+  subscribeWithSelector((set, get) => ({
+    ...initialState,
+
+    loadChats: async () => {
+      set((state) => ({
+        loading: { ...state.loading, chats: true },
+        error: { ...state.error, chats: null },
+      }));
+
+      try {
+        const response = await fetch('/api/chats', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load chats');
+        }
+
+        const { chats }: { chats: Chat[] } = await response.json();
+        
+        // Transform dates from string to Date objects
+        const transformedChats = chats.map(chat => ({
+          ...chat,
+          createdAt: new Date(chat.createdAt),
+          updatedAt: new Date(chat.updatedAt),
+        }));
+
+        set((state) => ({
+          chats: transformedChats,
+          loading: { ...state.loading, chats: false },
+        }));
+      } catch (error) {
+        set((state) => ({
+          loading: { ...state.loading, chats: false },
+          error: { 
+            ...state.error, 
+            chats: error instanceof Error ? error.message : 'Failed to load chats' 
+          },
+        }));
+      }
+    },
+
+    createChat: async (request: CreateChatRequest) => {
+      try {
+        const response = await fetch('/api/chats', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create chat');
+        }
+
+        const { chat }: { chat: Chat } = await response.json();
+        
+        // Transform dates
+        const transformedChat = {
+          ...chat,
+          createdAt: new Date(chat.createdAt),
+          updatedAt: new Date(chat.updatedAt),
+        };
+
+        set((state) => ({
+          chats: [transformedChat, ...state.chats],
+          currentChat: transformedChat,
+          messages: [],
+        }));
+
+        return chat.id;
+      } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to create chat');
+      }
+    },
+
+    selectChat: async (chatId: string) => {
+      const chat = get().chats.find(c => c.id === chatId);
+      if (!chat) return;
+
+      set({ currentChat: chat });
+      await get().loadMessages(chatId);
+    },
+
+    updateChatTitle: async (chatId: string, title: string) => {
+      try {
+        const response = await fetch(`/api/chats/${chatId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update chat title');
+        }
+
+        set((state) => ({
+          chats: state.chats.map(chat =>
+            chat.id === chatId ? { ...chat, title } : chat
+          ),
+          currentChat: state.currentChat?.id === chatId 
+            ? { ...state.currentChat, title }
+            : state.currentChat,
+        }));
+      } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to update chat title');
+      }
+    },
+
+    deleteChat: async (chatId: string) => {
+      try {
+        const response = await fetch(`/api/chats/${chatId}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete chat');
+        }
+
+        set((state) => ({
+          chats: state.chats.filter(chat => chat.id !== chatId),
+          currentChat: state.currentChat?.id === chatId ? null : state.currentChat,
+          messages: state.currentChat?.id === chatId ? [] : state.messages,
+        }));
+      } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to delete chat');
+      }
+    },
+
+    loadMessages: async (chatId: string) => {
+      set((state) => ({
+        loading: { ...state.loading, messages: true },
+        error: { ...state.error, messages: null },
+      }));
+
+      try {
+        const response = await fetch(`/api/chats/${chatId}/messages`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load messages');
+        }
+
+        const { messages }: { messages: Message[] } = await response.json();
+        
+        // Transform dates
+        const transformedMessages = messages.map(message => ({
+          ...message,
+          createdAt: new Date(message.createdAt),
+        }));
+
+        set((state) => ({
+          messages: transformedMessages,
+          loading: { ...state.loading, messages: false },
+        }));
+      } catch (error) {
+        set((state) => ({
+          loading: { ...state.loading, messages: false },
+          error: { 
+            ...state.error, 
+            messages: error instanceof Error ? error.message : 'Failed to load messages' 
+          },
+        }));
+      }
+    },
+
+    sendMessage: async (request: SendMessageRequest) => {
+      set((state) => ({
+        loading: { ...state.loading, sending: true },
+        error: { ...state.error, sending: null },
+      }));
+
+      // Optimistically add user message
+      const userMessage: Message = {
+        id: `temp-${Date.now()}`,
+        chatId: request.chatId,
+        role: 'user',
+        content: request.content,
+        createdAt: new Date(),
+      };
+
+      set((state) => ({
+        messages: [...state.messages, userMessage],
+      }));
+
+      try {
+        const response = await fetch(`/api/chats/${request.chatId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content: request.content }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send message');
+        }
+
+        const { message, assistantMessage } = await response.json();
+        
+        // Transform dates
+        const transformedMessage = {
+          ...message,
+          createdAt: new Date(message.createdAt),
+        };
+        
+        const transformedAssistantMessage = assistantMessage ? {
+          ...assistantMessage,
+          createdAt: new Date(assistantMessage.createdAt),
+        } : null;
+
+        set((state) => ({
+          messages: [
+            ...state.messages.filter(m => m.id !== userMessage.id),
+            transformedMessage,
+            ...(transformedAssistantMessage ? [transformedAssistantMessage] : []),
+          ],
+          loading: { ...state.loading, sending: false },
+          // Update chat's last message and updatedAt
+          chats: state.chats.map(chat =>
+            chat.id === request.chatId
+              ? {
+                  ...chat,
+                  lastMessage: transformedAssistantMessage?.content || transformedMessage.content,
+                  updatedAt: new Date(),
+                }
+              : chat
+          ),
+        }));
+      } catch (error) {
+        // Remove optimistic message on error
+        set((state) => ({
+          messages: state.messages.filter(m => m.id !== userMessage.id),
+          loading: { ...state.loading, sending: false },
+          error: { 
+            ...state.error, 
+            sending: error instanceof Error ? error.message : 'Failed to send message' 
+          },
+        }));
+      }
+    },
+
+    clearError: (type: 'chats' | 'messages' | 'sending') => {
+      set((state) => ({
+        error: { ...state.error, [type]: null },
+      }));
+    },
+
+    reset: () => {
+      set(initialState);
+    },
+  }))
+);
