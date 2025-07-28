@@ -15,8 +15,10 @@ export function ChatInterface() {
   } = useChat();
 
   const handleSendMessage = async (content: string) => {
+    console.log('Sending message:', content);
     try {
-      await sendMessageInCurrentChat(content);
+      const result = await sendMessageInCurrentChat(content);
+      console.log('Message sent successfully:', result);
     } catch (error) {
       console.error('Failed to send message:', error);
     }

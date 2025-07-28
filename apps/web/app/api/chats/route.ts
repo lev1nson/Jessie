@@ -26,11 +26,14 @@ export async function GET(request: NextRequest) {
     const cookieStore = cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
+          getAll: () => cookieStore.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
           },
         },
       }
@@ -107,27 +110,64 @@ export async function POST(request: NextRequest) {
     const cookieStore = cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
+          getAll: () => cookieStore.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
           },
         },
       }
     );
 
     // Get authenticated user
+    console.log('Getting authenticated user...');
     const { data: { user }, error: authError } = await supabase.auth.getUser();
+    console.log('Auth result:', { user: user?.id, authError });
+    
     if (authError || !user) {
+      console.error('Authentication failed:', authError);
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
+    // Ensure user exists in users table
+    const { data: existingUser, error: userCheckError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single();
+
+    if (userCheckError && userCheckError.code === 'PGRST116') {
+      // User doesn't exist, create them
+      console.log('Creating user record...');
+      const { error: createUserError } = await supabase
+        .from('users')
+        .insert({
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+          avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+        });
+
+      if (createUserError) {
+        console.error('Error creating user:', createUserError);
+        return NextResponse.json(
+          { error: 'Failed to create user profile' },
+          { status: 500 }
+        );
+      }
+    }
+
     // Create new chat
     const chatTitle = title || firstMessage?.substring(0, 50) || 'New Chat';
+    console.log('Creating chat with:', { user_id: user.id, title: chatTitle });
+    
     const { data: chat, error: chatError } = await supabase
       .from('chats')
       .insert({
@@ -140,7 +180,7 @@ export async function POST(request: NextRequest) {
     if (chatError) {
       console.error('Error creating chat:', chatError);
       return NextResponse.json(
-        { error: 'Failed to create chat' },
+        { error: 'Failed to create chat', details: chatError.message },
         { status: 500 }
       );
     }

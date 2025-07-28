@@ -39,6 +39,9 @@ export function useChat() {
     if (!store.currentChat) {
       // Create a new chat if none is selected
       const chatId = await startNewChat(content);
+      if (!chatId) {
+        throw new Error('Failed to create new chat');
+      }
       return chatId;
     }
 

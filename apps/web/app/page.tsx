@@ -2,11 +2,14 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from '../lib/auth-server';
 
 export default async function Home() {
-  const session = await getServerSession();
-
-  // Redirect authenticated users to dashboard
-  if (session) {
-    redirect('/dashboard');
+  try {
+    const session = await getServerSession();
+    if (session) {
+      redirect('/dashboard');
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    // Continue to render page if auth fails
   }
 
   return (

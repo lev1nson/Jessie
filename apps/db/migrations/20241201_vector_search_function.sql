@@ -9,9 +9,9 @@ RETURNS TABLE (
   id uuid,
   subject text,
   body_text text,
-  sent_at timestamptz,
-  metadata jsonb,
-  text_chunks jsonb,
+  date_sent timestamptz,
+  sender text,
+  recipient text,
   similarity float
 )
 LANGUAGE plpgsql
@@ -22,9 +22,9 @@ BEGIN
     e.id,
     e.subject,
     e.body_text,
-    e.sent_at,
-    e.metadata,
-    e.text_chunks,
+    e.date_sent,
+    e.sender,
+    e.recipient,
     1 - (e.embedding <=> query_embedding) AS similarity
   FROM emails e
   WHERE 

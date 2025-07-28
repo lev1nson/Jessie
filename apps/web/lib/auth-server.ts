@@ -3,15 +3,22 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  console.error('Missing Supabase environment variables');
+  // Don't throw in production to prevent breaking the app
+  // throw new Error('Missing Supabase environment variables');
 }
 
 // Server-side Supabase client for server components
 export const createServerSupabaseClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Supabase not configured');
+    return null;
+  }
+  
   const cookieStore = cookies();
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -54,6 +61,10 @@ export type UserProfile = z.infer<typeof UserProfileSchema>;
 // Helper function to get user session
 export const getServerSession = async () => {
   const supabase = createServerSupabaseClient();
+  if (!supabase) {
+    return null;
+  }
+  
   const { data: { session }, error } = await supabase.auth.getSession();
   
   if (error) {

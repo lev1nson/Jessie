@@ -124,6 +124,20 @@ export async function GET(request: NextRequest) {
 
     // Create or update user profile in public.users table
     try {
+      // Extract Google API tokens from the session
+      const googleTokens = session.provider_token && session.provider_refresh_token ? {
+        google_access_token: session.provider_token,
+        google_refresh_token: session.provider_refresh_token,
+        google_token_expiry: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : null,
+      } : {};
+
+      console.log('Saving Google tokens:', {
+        hasAccessToken: !!session.provider_token,
+        hasRefreshToken: !!session.provider_refresh_token,
+        expiresAt: session.expires_at,
+        userId: user.id
+      });
+
       const { error: upsertError } = await supabase
         .from('users')
         .upsert({
@@ -133,6 +147,7 @@ export async function GET(request: NextRequest) {
           name: user.user_metadata.full_name || user.user_metadata.name || user.email!.split('@')[0],
           avatar_url: user.user_metadata.avatar_url || user.user_metadata.picture,
           updated_at: new Date().toISOString(),
+          ...googleTokens,
         }, {
           onConflict: 'id'
         });

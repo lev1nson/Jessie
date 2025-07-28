@@ -1,0 +1,495 @@
+
+> web@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.30
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+  - Experiments (use with caution):
+    · typedRoutes
+
+ ✓ Starting...
+ ✓ Ready in 1036ms
+ ✓ Compiled /middleware in 67ms (143 modules)
+ ✓ Compiled / in 238ms (592 modules)
+ HEAD / 200 in 325ms
+Auth check failed: Error: NEXT_REDIRECT
+    at getRedirectError (webpack-internal:///(rsc)/../../node_modules/next/dist/client/components/redirect.js:49:19)
+    at redirect (webpack-internal:///(rsc)/../../node_modules/next/dist/client/components/redirect.js:60:11)
+    at Home (webpack-internal:///(rsc)/./app/page.tsx:16:70) {
+  digest: 'NEXT_REDIRECT;replace;/dashboard;307;',
+  mutableCookies: p {
+    _parsed: Map(10) {
+      '__clerk_db_jwt' => [Object],
+      '__clerk_db_jwt_s8izut9h' => [Object],
+      '__refresh_s8izut9h' => [Object],
+      '__session' => [Object],
+      '__session_s8izut9h' => [Object],
+      '__client_uat_s8izut9h' => [Object],
+      '__client_uat' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token-code-verifier' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token.0' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token.1' => [Object]
+    },
+    _headers: Headers {
+      'set-cookie': '__clerk_db_jwt=dvb_2zGetvciJFTea5DBMmnYTHyVLrc; Path=/, __clerk_db_jwt_s8izut9h=dvb_2zGetvciJFTea5DBMmnYTHyVLrc; Path=/, __refresh_s8izut9h=ni7MSJaAyvk3UrGQKK1M; Path=/, __session=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18yejZOOUdrSTdGODllVkV2c241U3BEUGx2anYiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NTE5NjM5MjQsImZ2YSI6Wzg3MDIsLTFdLCJpYXQiOjE3NTE5NjM4NjQsImlzcyI6Imh0dHBzOi8vcGxlYXNhbnQtaGVuLTk3LmNsZXJrLmFjY291bnRzLmRldiIsIm5iZiI6MTc1MTk2Mzg1NCwic2lkIjoic2Vzc18yekpHTHNnR2MwVE5UbGxISXJFWERhZlk5U2UiLCJzdWIiOiJ1c2VyXzJ6R2YyNzZWTzZONXpzbEhvcWdSRTBLSjhTWCIsInYiOjJ9.0skUx35HKSqaI5nameSaxbN_00yo2d1QtV1thDya_o3XNc6dKM4OO6CtaCosBnG_taOb7_D_mwi311luS4dhUGJzZCfs1JpEnawx62yJtBg9PIST8qax9FasFLzYod-pOKRT6a5JysAnffodrQAmejVbZKZhB51kwx1K2zpzlhk8U23jQl8hx56ak1zZ6ld4bykLqaiV8t2kZr5RmtGLE1pFgjbpjg_7ey1V4w1yzfxc3OE9kndMEO-HKAo-cJPVp09mRBpWHvhr2uwVMh5Am_bseOP1eIGVjrJhAI1Wm3D9YB8ZltGJlYN80G_ZiNB_DpJXNqg_98FfQKXgg2xlvQ; Path=/, __session_s8izut9h=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18yejZOOUdrSTdGODllVkV2c241U3BEUGx2anYiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NTE5NjM5MjQsImZ2YSI6Wzg3MDIsLTFdLCJpYXQiOjE3NTE5NjM4NjQsImlzcyI6Imh0dHBzOi8vcGxlYXNhbnQtaGVuLTk3LmNsZXJrLmFjY291bnRzLmRldiIsIm5iZiI6MTc1MTk2Mzg1NCwic2lkIjoic2Vzc18yekpHTHNnR2MwVE5UbGxISXJFWERhZlk5U2UiLCJzdWIiOiJ1c2VyXzJ6R2YyNzZWTzZONXpzbEhvcWdSRTBLSjhTWCIsInYiOjJ9.0skUx35HKSqaI5nameSaxbN_00yo2d1QtV1thDya_o3XNc6dKM4OO6CtaCosBnG_taOb7_D_mwi311luS4dhUGJzZCfs1JpEnawx62yJtBg9PIST8qax9FasFLzYod-pOKRT6a5JysAnffodrQAmejVbZKZhB51kwx1K2zpzlhk8U23jQl8hx56ak1zZ6ld4bykLqaiV8t2kZr5RmtGLE1pFgjbpjg_7ey1V4w1yzfxc3OE9kndMEO-HKAo-cJPVp09mRBpWHvhr2uwVMh5Am_bseOP1eIGVjrJhAI1Wm3D9YB8ZltGJlYN80G_ZiNB_DpJXNqg_98FfQKXgg2xlvQ; Path=/, __client_uat_s8izut9h=1751441709; Path=/, __client_uat=1751441709; Path=/, sb-kuruznkxdywvvwystdor-auth-token-code-verifier=base64-IjhjMTMyOWZmNDU5MzI4MDNjZTA5MDVhYWM4OTkzYzMyNmIzNGY5MTEwMzE1M2M2MTI0NWMyNmI4ZWI2Yjk4YmVjZWVlNmFmNmZlMGY4NTljYjY3MTUyMzljZmNlMGE4NjE2MTUzMzc2OGZjNGM4YjMi; Path=/, sb-kuruznkxdywvvwystdor-auth-token.0=base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SW05cU9VNDJVR2h6YjNGeFRrRXphMUlpTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJ0MWNuVjZibXQ0WkhsM2RuWjNlWE4wWkc5eUxuTjFjR0ZpWVhObExtTnZMMkYxZEdndmRqRWlMQ0p6ZFdJaU9pSmhOakl5TWpJME5pMHdZalV6TFRSaVpUSXRZVGxsTVMwME9UQmtNV0ZpTURBME5Ua2lMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpYaHdJam94TnpVek5qSXlOVEUwTENKcFlYUWlPakUzTlRNMk1UZzVNVFFzSW1WdFlXbHNJam9pYldGNFlXNWtjbTlwWkRReVFHZHRZV2xzTG1OdmJTSXNJbkJvYjI1bElqb2lJaXdpWVhCd1gyMWxkR0ZrWVhSaElqcDdJbkJ5YjNacFpHVnlJam9pWjI5dloyeGxJaXdpY0hKdmRtbGtaWEp6SWpwYkltZHZiMmRzWlNKZGZTd2lkWE5sY2w5dFpYUmhaR0YwWVNJNmV5SmhkbUYwWVhKZmRYSnNJam9pYUhSMGNITTZMeTlzYURNdVoyOXZaMnhsZFhObGNtTnZiblJsYm5RdVkyOXRMMkV2UVVObk9HOWpTbFJqTTI5WmFrTXlSbWRJUld4emFuTjNjMUo1VTA5WmVrOWlUMDl2TmkxcFdVaE9aa3RWTUdsYVRtOHRVV05sZFhBOWN6azJMV01pTENKbGJXRnBiQ0k2SW0xaGVHRnVaSEp2YVdRME1rQm5iV0ZwYkM1amIyMGlMQ0psYldGcGJGOTJaWEpwWm1sbFpDSTZkSEoxWlN3aVpuVnNiRjl1WVcxbElqb2lUV0ZyYzJsdElFdG9kWHBwYmlJc0ltbHpjeUk2SW1oMGRIQnpPaTh2WVdOamIzVnVkSE11WjI5dloyeGxMbU52YlNJc0ltNWhiV1VpT2lKTllXdHphVzBnUzJoMWVtbHVJaXdpY0dodmJtVmZkbVZ5YVdacFpXUWlPbVpoYkhObExDSndhV04wZFhKbElqb2lhSFIwY0hNNkx5OXNhRE11WjI5dloyeGxkWE5sY21OdmJuUmxiblF1WTI5dEwyRXZRVU5uT0c5alNsUmpNMjlaYWtNeVJtZElSV3h6YW5OM2MxSjVVMDlaZWs5aVQwOXZOaTFwV1VoT1prdFZNR2xhVG04dFVXTmxkWEE5Y3prMkxXTWlMQ0p3Y205MmFXUmxjbDlwWkNJNklqRXdOek15T0RjMU1UYzNORGcwTURJMU9UazNOeUlzSW5OMVlpSTZJakV3TnpNeU9EYzFNVGMzTkRnME1ESTFPVGszTnlKOUxDSnliMnhsSWpvaVlYVjBhR1Z1ZEdsallYUmxaQ0lzSW1GaGJDSTZJbUZoYkRFaUxDSmhiWElpT2x0N0ltMWxkR2h2WkNJNkltOWhkWFJvSWl3aWRHbHRaWE4wWVcxd0lqb3hOelV6TmpBM05UQTJmVjBzSW5ObGMzTnBiMjVmYVdRaU9pSXhPRFptWkdJeE1TMWxZekk0TFRReFl6VXRZalJqT0MweVlqa3dPVGswTXpBNVpEY2lMQ0pwYzE5aGJtOXVlVzF2ZFhNaU9tWmhiSE5sZlEueXNZMnBTZkFJbzFpRW4tQVVDXzhwRHY0cEtsdVdqcDhDTEcyU0N4YjJTSSIsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJleHBpcmVzX2luIjozNjAwLCJleHBpcmVzX2F0IjoxNzUzNjIyNTE0LCJyZWZyZXNoX3Rva2VuIjoieHl2dmVmYmttcml3IiwidXNlciI6eyJpZCI6ImE2MjIyMjQ2LTBiNTMtNGJlMi1hOWUxLTQ5MGQxYWIwMDQ1OSIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoibWF4YW5kcm9pZDQyQGdtYWlsLmNvbSIsImVtYWlsX2NvbmZpcm1lZF9hdCI6IjIwMjUtMDctMjdUMDk6MDU6NTAuNTk0MzJaIiwicGhvbmUiOiIiLCJjb25maXJtZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjA1OjUwLjU5NDMyWiIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMDctMjdUMDk6MTE6NDYuMzM4MzM4WiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6Imdvb2dsZSIsInByb3ZpZGVycyI6WyJnb29nbGUiXX0sInVzZXJfbWV0YWRhdGEiOnsiYXZhdGFyX3VybCI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pUYzNvWWpDMkZnSEVsc2pzd3NSeVNPWXpPYk9PbzYtaVlITmZLVTBpWk5vLVFjZXVwPXM5Ni1jIiwiZW1haWwiOiJtYXhhbmRyb2lkNDJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6Ik1ha3NpbSBLaHV6aW4iLCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYW1lIjoiTWFrc2ltIEtodXppbiIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pUYzNvWWpDMkZnSEVsc2pzd3NSeVNPWXpPYk9PbzYtaVlITmZLVTBpWk5vLVFjZXVwPXM5Ni1jIiwicHJvdmlkZXJfaWQiOiIxMDczMjg3NTE3NzQ4NDAyNTk5NzciLCJzdWIiOiIxMDczMjg3NTE3NzQ4NDAyNTk5NzcifSwiaWRlbnRpdGllcyI6W3siaWRlbnRpdHlfaWQiOiJhZDBlZWJmZC1mODA3LTQwYzAtODU0My1iYmUzMjQ5ODc0YjEiLCJpZCI6IjEwNzMyODc1MTc3NDg0MDI1OTk3NyIsInVzZXJfaWQiOiJhNjIyMjI0Ni0wYjUzLTRiZTItYTllMS00O; Path=/, sb-kuruznkxdywvvwystdor-auth-token.1=TBkMWFiMDA0NTkiLCJpZGVudGl0eV9kYXRhIjp7ImF2YXRhcl91cmwiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKVGMzb1lqQzJGZ0hFbHNqc3dzUnlTT1l6T2JPT282LWlZSE5mS1UwaVpOby1RY2V1cD1zOTYtYyIsImVtYWlsIjoibWF4YW5kcm9pZDQyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJNYWtzaW0gS2h1emluIiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tIiwibmFtZSI6Ik1ha3NpbSBLaHV6aW4iLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKVGMzb1lqQzJGZ0hFbHNqc3dzUnlTT1l6T2JPT282LWlZSE5mS1UwaVpOby1RY2V1cD1zOTYtYyIsInByb3ZpZGVyX2lkIjoiMTA3MzI4NzUxNzc0ODQwMjU5OTc3Iiwic3ViIjoiMTA3MzI4NzUxNzc0ODQwMjU5OTc3In0sInByb3ZpZGVyIjoiZ29vZ2xlIiwibGFzdF9zaWduX2luX2F0IjoiMjAyNS0wNy0yN1QwOTowNTo1MC41ODU0NzZaIiwiY3JlYXRlZF9hdCI6IjIwMjUtMDctMjdUMDk6MDU6NTAuNTg1NTI4WiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjE5OjE4LjU1MTYxNloiLCJlbWFpbCI6Im1heGFuZHJvaWQ0MkBnbWFpbC5jb20ifV0sImNyZWF0ZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjA1OjUwLjU2NTgzM1oiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNy0yN1QxMjoyMTo1NC4zMjkzMVoiLCJpc19hbm9ueW1vdXMiOmZhbHNlfX0; Path=/'
+    }
+  }
+}
+ GET / 200 in 19ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 882ms (1059 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ GET /dashboard 200 in 998ms
+Auth check failed: Error: NEXT_REDIRECT
+    at getRedirectError (webpack-internal:///(rsc)/../../node_modules/next/dist/client/components/redirect.js:49:19)
+    at redirect (webpack-internal:///(rsc)/../../node_modules/next/dist/client/components/redirect.js:60:11)
+    at Home (webpack-internal:///(rsc)/./app/page.tsx:16:70) {
+  digest: 'NEXT_REDIRECT;replace;/dashboard;307;',
+  mutableCookies: p {
+    _parsed: Map(10) {
+      '__clerk_db_jwt' => [Object],
+      '__clerk_db_jwt_s8izut9h' => [Object],
+      '__refresh_s8izut9h' => [Object],
+      '__session' => [Object],
+      '__session_s8izut9h' => [Object],
+      '__client_uat_s8izut9h' => [Object],
+      '__client_uat' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token-code-verifier' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token.0' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token.1' => [Object]
+    },
+    _headers: Headers {
+      'set-cookie': '__clerk_db_jwt=dvb_2zGetvciJFTea5DBMmnYTHyVLrc; Path=/, __clerk_db_jwt_s8izut9h=dvb_2zGetvciJFTea5DBMmnYTHyVLrc; Path=/, __refresh_s8izut9h=ni7MSJaAyvk3UrGQKK1M; Path=/, __session=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18yejZOOUdrSTdGODllVkV2c241U3BEUGx2anYiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NTE5NjM5MjQsImZ2YSI6Wzg3MDIsLTFdLCJpYXQiOjE3NTE5NjM4NjQsImlzcyI6Imh0dHBzOi8vcGxlYXNhbnQtaGVuLTk3LmNsZXJrLmFjY291bnRzLmRldiIsIm5iZiI6MTc1MTk2Mzg1NCwic2lkIjoic2Vzc18yekpHTHNnR2MwVE5UbGxISXJFWERhZlk5U2UiLCJzdWIiOiJ1c2VyXzJ6R2YyNzZWTzZONXpzbEhvcWdSRTBLSjhTWCIsInYiOjJ9.0skUx35HKSqaI5nameSaxbN_00yo2d1QtV1thDya_o3XNc6dKM4OO6CtaCosBnG_taOb7_D_mwi311luS4dhUGJzZCfs1JpEnawx62yJtBg9PIST8qax9FasFLzYod-pOKRT6a5JysAnffodrQAmejVbZKZhB51kwx1K2zpzlhk8U23jQl8hx56ak1zZ6ld4bykLqaiV8t2kZr5RmtGLE1pFgjbpjg_7ey1V4w1yzfxc3OE9kndMEO-HKAo-cJPVp09mRBpWHvhr2uwVMh5Am_bseOP1eIGVjrJhAI1Wm3D9YB8ZltGJlYN80G_ZiNB_DpJXNqg_98FfQKXgg2xlvQ; Path=/, __session_s8izut9h=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18yejZOOUdrSTdGODllVkV2c241U3BEUGx2anYiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NTE5NjM5MjQsImZ2YSI6Wzg3MDIsLTFdLCJpYXQiOjE3NTE5NjM4NjQsImlzcyI6Imh0dHBzOi8vcGxlYXNhbnQtaGVuLTk3LmNsZXJrLmFjY291bnRzLmRldiIsIm5iZiI6MTc1MTk2Mzg1NCwic2lkIjoic2Vzc18yekpHTHNnR2MwVE5UbGxISXJFWERhZlk5U2UiLCJzdWIiOiJ1c2VyXzJ6R2YyNzZWTzZONXpzbEhvcWdSRTBLSjhTWCIsInYiOjJ9.0skUx35HKSqaI5nameSaxbN_00yo2d1QtV1thDya_o3XNc6dKM4OO6CtaCosBnG_taOb7_D_mwi311luS4dhUGJzZCfs1JpEnawx62yJtBg9PIST8qax9FasFLzYod-pOKRT6a5JysAnffodrQAmejVbZKZhB51kwx1K2zpzlhk8U23jQl8hx56ak1zZ6ld4bykLqaiV8t2kZr5RmtGLE1pFgjbpjg_7ey1V4w1yzfxc3OE9kndMEO-HKAo-cJPVp09mRBpWHvhr2uwVMh5Am_bseOP1eIGVjrJhAI1Wm3D9YB8ZltGJlYN80G_ZiNB_DpJXNqg_98FfQKXgg2xlvQ; Path=/, __client_uat_s8izut9h=1751441709; Path=/, __client_uat=1751441709; Path=/, sb-kuruznkxdywvvwystdor-auth-token-code-verifier=base64-IjhjMTMyOWZmNDU5MzI4MDNjZTA5MDVhYWM4OTkzYzMyNmIzNGY5MTEwMzE1M2M2MTI0NWMyNmI4ZWI2Yjk4YmVjZWVlNmFmNmZlMGY4NTljYjY3MTUyMzljZmNlMGE4NjE2MTUzMzc2OGZjNGM4YjMi; Path=/, sb-kuruznkxdywvvwystdor-auth-token.0=base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SW05cU9VNDJVR2h6YjNGeFRrRXphMUlpTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJ0MWNuVjZibXQ0WkhsM2RuWjNlWE4wWkc5eUxuTjFjR0ZpWVhObExtTnZMMkYxZEdndmRqRWlMQ0p6ZFdJaU9pSmhOakl5TWpJME5pMHdZalV6TFRSaVpUSXRZVGxsTVMwME9UQmtNV0ZpTURBME5Ua2lMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpYaHdJam94TnpVek5qSXlOVEUwTENKcFlYUWlPakUzTlRNMk1UZzVNVFFzSW1WdFlXbHNJam9pYldGNFlXNWtjbTlwWkRReVFHZHRZV2xzTG1OdmJTSXNJbkJvYjI1bElqb2lJaXdpWVhCd1gyMWxkR0ZrWVhSaElqcDdJbkJ5YjNacFpHVnlJam9pWjI5dloyeGxJaXdpY0hKdmRtbGtaWEp6SWpwYkltZHZiMmRzWlNKZGZTd2lkWE5sY2w5dFpYUmhaR0YwWVNJNmV5SmhkbUYwWVhKZmRYSnNJam9pYUhSMGNITTZMeTlzYURNdVoyOXZaMnhsZFhObGNtTnZiblJsYm5RdVkyOXRMMkV2UVVObk9HOWpTbFJqTTI5WmFrTXlSbWRJUld4emFuTjNjMUo1VTA5WmVrOWlUMDl2TmkxcFdVaE9aa3RWTUdsYVRtOHRVV05sZFhBOWN6azJMV01pTENKbGJXRnBiQ0k2SW0xaGVHRnVaSEp2YVdRME1rQm5iV0ZwYkM1amIyMGlMQ0psYldGcGJGOTJaWEpwWm1sbFpDSTZkSEoxWlN3aVpuVnNiRjl1WVcxbElqb2lUV0ZyYzJsdElFdG9kWHBwYmlJc0ltbHpjeUk2SW1oMGRIQnpPaTh2WVdOamIzVnVkSE11WjI5dloyeGxMbU52YlNJc0ltNWhiV1VpT2lKTllXdHphVzBnUzJoMWVtbHVJaXdpY0dodmJtVmZkbVZ5YVdacFpXUWlPbVpoYkhObExDSndhV04wZFhKbElqb2lhSFIwY0hNNkx5OXNhRE11WjI5dloyeGxkWE5sY21OdmJuUmxiblF1WTI5dEwyRXZRVU5uT0c5alNsUmpNMjlaYWtNeVJtZElSV3h6YW5OM2MxSjVVMDlaZWs5aVQwOXZOaTFwV1VoT1prdFZNR2xhVG04dFVXTmxkWEE5Y3prMkxXTWlMQ0p3Y205MmFXUmxjbDlwWkNJNklqRXdOek15T0RjMU1UYzNORGcwTURJMU9UazNOeUlzSW5OMVlpSTZJakV3TnpNeU9EYzFNVGMzTkRnME1ESTFPVGszTnlKOUxDSnliMnhsSWpvaVlYVjBhR1Z1ZEdsallYUmxaQ0lzSW1GaGJDSTZJbUZoYkRFaUxDSmhiWElpT2x0N0ltMWxkR2h2WkNJNkltOWhkWFJvSWl3aWRHbHRaWE4wWVcxd0lqb3hOelV6TmpBM05UQTJmVjBzSW5ObGMzTnBiMjVmYVdRaU9pSXhPRFptWkdJeE1TMWxZekk0TFRReFl6VXRZalJqT0MweVlqa3dPVGswTXpBNVpEY2lMQ0pwYzE5aGJtOXVlVzF2ZFhNaU9tWmhiSE5sZlEueXNZMnBTZkFJbzFpRW4tQVVDXzhwRHY0cEtsdVdqcDhDTEcyU0N4YjJTSSIsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJleHBpcmVzX2luIjozNjAwLCJleHBpcmVzX2F0IjoxNzUzNjIyNTE0LCJyZWZyZXNoX3Rva2VuIjoieHl2dmVmYmttcml3IiwidXNlciI6eyJpZCI6ImE2MjIyMjQ2LTBiNTMtNGJlMi1hOWUxLTQ5MGQxYWIwMDQ1OSIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoibWF4YW5kcm9pZDQyQGdtYWlsLmNvbSIsImVtYWlsX2NvbmZpcm1lZF9hdCI6IjIwMjUtMDctMjdUMDk6MDU6NTAuNTk0MzJaIiwicGhvbmUiOiIiLCJjb25maXJtZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjA1OjUwLjU5NDMyWiIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMDctMjdUMDk6MTE6NDYuMzM4MzM4WiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6Imdvb2dsZSIsInByb3ZpZGVycyI6WyJnb29nbGUiXX0sInVzZXJfbWV0YWRhdGEiOnsiYXZhdGFyX3VybCI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pUYzNvWWpDMkZnSEVsc2pzd3NSeVNPWXpPYk9PbzYtaVlITmZLVTBpWk5vLVFjZXVwPXM5Ni1jIiwiZW1haWwiOiJtYXhhbmRyb2lkNDJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6Ik1ha3NpbSBLaHV6aW4iLCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYW1lIjoiTWFrc2ltIEtodXppbiIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pUYzNvWWpDMkZnSEVsc2pzd3NSeVNPWXpPYk9PbzYtaVlITmZLVTBpWk5vLVFjZXVwPXM5Ni1jIiwicHJvdmlkZXJfaWQiOiIxMDczMjg3NTE3NzQ4NDAyNTk5NzciLCJzdWIiOiIxMDczMjg3NTE3NzQ4NDAyNTk5NzcifSwiaWRlbnRpdGllcyI6W3siaWRlbnRpdHlfaWQiOiJhZDBlZWJmZC1mODA3LTQwYzAtODU0My1iYmUzMjQ5ODc0YjEiLCJpZCI6IjEwNzMyODc1MTc3NDg0MDI1OTk3NyIsInVzZXJfaWQiOiJhNjIyMjI0Ni0wYjUzLTRiZTItYTllMS00O; Path=/, sb-kuruznkxdywvvwystdor-auth-token.1=TBkMWFiMDA0NTkiLCJpZGVudGl0eV9kYXRhIjp7ImF2YXRhcl91cmwiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKVGMzb1lqQzJGZ0hFbHNqc3dzUnlTT1l6T2JPT282LWlZSE5mS1UwaVpOby1RY2V1cD1zOTYtYyIsImVtYWlsIjoibWF4YW5kcm9pZDQyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJNYWtzaW0gS2h1emluIiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tIiwibmFtZSI6Ik1ha3NpbSBLaHV6aW4iLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKVGMzb1lqQzJGZ0hFbHNqc3dzUnlTT1l6T2JPT282LWlZSE5mS1UwaVpOby1RY2V1cD1zOTYtYyIsInByb3ZpZGVyX2lkIjoiMTA3MzI4NzUxNzc0ODQwMjU5OTc3Iiwic3ViIjoiMTA3MzI4NzUxNzc0ODQwMjU5OTc3In0sInByb3ZpZGVyIjoiZ29vZ2xlIiwibGFzdF9zaWduX2luX2F0IjoiMjAyNS0wNy0yN1QwOTowNTo1MC41ODU0NzZaIiwiY3JlYXRlZF9hdCI6IjIwMjUtMDctMjdUMDk6MDU6NTAuNTg1NTI4WiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjE5OjE4LjU1MTYxNloiLCJlbWFpbCI6Im1heGFuZHJvaWQ0MkBnbWFpbC5jb20ifV0sImNyZWF0ZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjA1OjUwLjU2NTgzM1oiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNy0yN1QxMjoyMTo1NC4zMjkzMVoiLCJpc19hbm9ueW1vdXMiOmZhbHNlfX0; Path=/'
+    }
+  }
+}
+ ⚠ The "images.domains" configuration is deprecated. Please use "images.remotePatterns" configuration instead.
+ ✓ Compiled /api/chats in 58ms (616 modules)
+ GET /api/chats 200 in 883ms
+ GET /api/chats 200 in 321ms
+ GET /api/chats 200 in 338ms
+ GET /api/chats 200 in 311ms
+ ✓ Compiled /_not-found in 116ms (1053 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 146ms
+Getting authenticated user...
+Auth result: { user: 'a6222246-0b53-4be2-a9e1-490d1ab00459', authError: null }
+Creating user record...
+Creating chat with: { user_id: 'a6222246-0b53-4be2-a9e1-490d1ab00459', title: 'hi...' }
+ POST /api/chats 200 in 967ms
+ ✓ Compiled /api/chat/messages in 145ms (718 modules)
+ POST /api/chat/messages 200 in 2427ms
+ POST /api/chat/messages 200 in 3967ms
+ ✓ Compiled in 145ms (1056 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled /api/chat/messages in 54ms (712 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ POST /api/chat/messages 200 in 2832ms
+ ✓ Compiled /api/chats in 85ms (714 modules)
+Getting authenticated user...
+Auth result: { user: 'a6222246-0b53-4be2-a9e1-490d1ab00459', authError: null }
+Creating chat with: { user_id: 'a6222246-0b53-4be2-a9e1-490d1ab00459', title: 'New Chat' }
+ POST /api/chats 200 in 614ms
+ ✓ Compiled /api/chats/[chatId]/messages in 52ms (716 modules)
+ GET /api/chats/f2a204b6-5e56-4b49-a215-cf9b95750107/messages 200 in 680ms
+ GET /api/chats/672c88bf-7dde-49a6-b2b5-43c093f8585c/messages 200 in 467ms
+ GET /api/chats/f2a204b6-5e56-4b49-a215-cf9b95750107/messages 200 in 466ms
+ GET /api/chats/f2a204b6-5e56-4b49-a215-cf9b95750107/messages 200 in 469ms
+ GET /api/chats/672c88bf-7dde-49a6-b2b5-43c093f8585c/messages 200 in 459ms
+ GET /api/chats/f2a204b6-5e56-4b49-a215-cf9b95750107/messages 200 in 453ms
+ ✓ Compiled in 72ms (448 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 93ms (1185 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 43ms (448 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 207ms (1056 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 196ms (1100 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 48ms (470 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 71ms (1229 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 41ms (470 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 66ms (1229 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled /dashboard/settings in 287ms (1103 modules)
+ ✓ Compiled /api/indexing/stats in 45ms (644 modules)
+ GET /api/indexing/stats 200 in 543ms
+ GET /api/indexing/stats 200 in 156ms
+ GET /api/indexing/stats 200 in 198ms
+ ✓ Compiled /api/indexing/sync in 53ms (646 modules)
+Manual sync triggered by user: maxandroid42@gmail.com
+ POST /api/indexing/sync 200 in 257ms
+ GET /api/indexing/stats 200 in 161ms
+Manual sync triggered by user: maxandroid42@gmail.com
+ POST /api/indexing/sync 200 in 162ms
+ GET /api/indexing/stats 200 in 158ms
+Manual sync triggered by user: maxandroid42@gmail.com
+ POST /api/indexing/sync 200 in 168ms
+ GET /api/indexing/stats 200 in 156ms
+ ✓ Compiled /api/chats in 58ms (649 modules)
+ GET /api/chats 200 in 435ms
+ GET /api/chats 200 in 304ms
+ GET /api/chats 200 in 322ms
+ GET /api/chats 200 in 311ms
+ ✓ Compiled /api/chat/messages in 109ms (750 modules)
+ POST /api/chat/messages 200 in 2780ms
+ ✓ Compiled in 117ms (1223 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled /api/indexing/stats in 40ms (644 modules)
+ GET /api/indexing/stats 200 in 941ms
+ GET /api/indexing/stats 200 in 474ms
+ ✓ Compiled /api/indexing/sync in 35ms (646 modules)
+Manual sync triggered by user: maxandroid42@gmail.com
+ POST /api/indexing/sync 200 in 194ms
+ GET /api/indexing/stats 200 in 477ms
+ GET /api/indexing/stats 200 in 470ms
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled /api/chats in 62ms (645 modules)
+ GET /api/chats 200 in 726ms
+ GET /api/chats 200 in 308ms
+ GET /api/chats 200 in 306ms
+ GET /api/chats 200 in 322ms
+ ✓ Compiled /api/chats/[chatId]/messages in 170ms (647 modules)
+ GET /api/chats/672c88bf-7dde-49a6-b2b5-43c093f8585c/messages 200 in 646ms
+ GET /api/chats/f2a204b6-5e56-4b49-a215-cf9b95750107/messages 200 in 708ms
+ ✓ Compiled /api/auth/logout in 62ms (649 modules)
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+User logged out: {
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com',
+  timestamp: '2025-07-27T13:07:25.678Z'
+}
+ POST /api/auth/logout 200 in 257ms
+ ✓ Compiled / in 49ms (652 modules)
+ GET / 200 in 95ms
+ ✓ Compiled /auth/login in 175ms (1128 modules)
+ GET /auth/login 200 in 232ms
+ ✓ Compiled /api/auth/google/login in 68ms (663 modules)
+Google OAuth POST request received { clientIP: '::1' }
+Initiating OAuth with Supabase {
+  provider: 'google',
+  redirectTo: 'http://localhost:3000/auth/callback',
+  supabaseUrl: 'https://kuruznkxdywvvwystdor.supabase.co'
+}
+Supabase OAuth response { data: 'URL received', error: undefined }
+[AUTH] OAuth flow initiated { timestamp: '2025-07-27T13:07:28.228Z', clientIP: '::1' }
+ POST /api/auth/google/login 200 in 88ms
+ ✓ Compiled /auth/callback in 95ms (1136 modules)
+ GET /auth/callback?code=260480bd-d9b7-4261-8003-b936ec0fc79e 200 in 157ms
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ GET /api/chats 200 in 352ms
+ GET /api/chats 200 in 304ms
+ GET /api/chats 200 in 316ms
+ GET /api/chats 200 in 313ms
+Auth check failed: Error: NEXT_REDIRECT
+    at getRedirectError (webpack-internal:///(rsc)/../../node_modules/next/dist/client/components/redirect.js:49:19)
+    at redirect (webpack-internal:///(rsc)/../../node_modules/next/dist/client/components/redirect.js:60:11)
+    at Home (webpack-internal:///(rsc)/./app/page.tsx:16:70) {
+  digest: 'NEXT_REDIRECT;replace;/dashboard;307;',
+  mutableCookies: p {
+    _parsed: Map(9) {
+      '__clerk_db_jwt' => [Object],
+      '__clerk_db_jwt_s8izut9h' => [Object],
+      '__refresh_s8izut9h' => [Object],
+      '__session' => [Object],
+      '__session_s8izut9h' => [Object],
+      '__client_uat_s8izut9h' => [Object],
+      '__client_uat' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token.0' => [Object],
+      'sb-kuruznkxdywvvwystdor-auth-token.1' => [Object]
+    },
+    _headers: Headers {
+      'set-cookie': '__clerk_db_jwt=dvb_2zGetvciJFTea5DBMmnYTHyVLrc; Path=/, __clerk_db_jwt_s8izut9h=dvb_2zGetvciJFTea5DBMmnYTHyVLrc; Path=/, __refresh_s8izut9h=ni7MSJaAyvk3UrGQKK1M; Path=/, __session=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18yejZOOUdrSTdGODllVkV2c241U3BEUGx2anYiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NTE5NjM5MjQsImZ2YSI6Wzg3MDIsLTFdLCJpYXQiOjE3NTE5NjM4NjQsImlzcyI6Imh0dHBzOi8vcGxlYXNhbnQtaGVuLTk3LmNsZXJrLmFjY291bnRzLmRldiIsIm5iZiI6MTc1MTk2Mzg1NCwic2lkIjoic2Vzc18yekpHTHNnR2MwVE5UbGxISXJFWERhZlk5U2UiLCJzdWIiOiJ1c2VyXzJ6R2YyNzZWTzZONXpzbEhvcWdSRTBLSjhTWCIsInYiOjJ9.0skUx35HKSqaI5nameSaxbN_00yo2d1QtV1thDya_o3XNc6dKM4OO6CtaCosBnG_taOb7_D_mwi311luS4dhUGJzZCfs1JpEnawx62yJtBg9PIST8qax9FasFLzYod-pOKRT6a5JysAnffodrQAmejVbZKZhB51kwx1K2zpzlhk8U23jQl8hx56ak1zZ6ld4bykLqaiV8t2kZr5RmtGLE1pFgjbpjg_7ey1V4w1yzfxc3OE9kndMEO-HKAo-cJPVp09mRBpWHvhr2uwVMh5Am_bseOP1eIGVjrJhAI1Wm3D9YB8ZltGJlYN80G_ZiNB_DpJXNqg_98FfQKXgg2xlvQ; Path=/, __session_s8izut9h=eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18yejZOOUdrSTdGODllVkV2c241U3BEUGx2anYiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NTE5NjM5MjQsImZ2YSI6Wzg3MDIsLTFdLCJpYXQiOjE3NTE5NjM4NjQsImlzcyI6Imh0dHBzOi8vcGxlYXNhbnQtaGVuLTk3LmNsZXJrLmFjY291bnRzLmRldiIsIm5iZiI6MTc1MTk2Mzg1NCwic2lkIjoic2Vzc18yekpHTHNnR2MwVE5UbGxISXJFWERhZlk5U2UiLCJzdWIiOiJ1c2VyXzJ6R2YyNzZWTzZONXpzbEhvcWdSRTBLSjhTWCIsInYiOjJ9.0skUx35HKSqaI5nameSaxbN_00yo2d1QtV1thDya_o3XNc6dKM4OO6CtaCosBnG_taOb7_D_mwi311luS4dhUGJzZCfs1JpEnawx62yJtBg9PIST8qax9FasFLzYod-pOKRT6a5JysAnffodrQAmejVbZKZhB51kwx1K2zpzlhk8U23jQl8hx56ak1zZ6ld4bykLqaiV8t2kZr5RmtGLE1pFgjbpjg_7ey1V4w1yzfxc3OE9kndMEO-HKAo-cJPVp09mRBpWHvhr2uwVMh5Am_bseOP1eIGVjrJhAI1Wm3D9YB8ZltGJlYN80G_ZiNB_DpJXNqg_98FfQKXgg2xlvQ; Path=/, __client_uat_s8izut9h=1751441709; Path=/, __client_uat=1751441709; Path=/, sb-kuruznkxdywvvwystdor-auth-token.0=base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SW05cU9VNDJVR2h6YjNGeFRrRXphMUlpTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJ0MWNuVjZibXQ0WkhsM2RuWjNlWE4wWkc5eUxuTjFjR0ZpWVhObExtTnZMMkYxZEdndmRqRWlMQ0p6ZFdJaU9pSmhOakl5TWpJME5pMHdZalV6TFRSaVpUSXRZVGxsTVMwME9UQmtNV0ZpTURBME5Ua2lMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpYaHdJam94TnpVek5qTXdNak0yTENKcFlYUWlPakUzTlRNMk1qWTJNellzSW1WdFlXbHNJam9pYldGNFlXNWtjbTlwWkRReVFHZHRZV2xzTG1OdmJTSXNJbkJvYjI1bElqb2lJaXdpWVhCd1gyMWxkR0ZrWVhSaElqcDdJbkJ5YjNacFpHVnlJam9pWjI5dloyeGxJaXdpY0hKdmRtbGtaWEp6SWpwYkltZHZiMmRzWlNKZGZTd2lkWE5sY2w5dFpYUmhaR0YwWVNJNmV5SmhkbUYwWVhKZmRYSnNJam9pYUhSMGNITTZMeTlzYURNdVoyOXZaMnhsZFhObGNtTnZiblJsYm5RdVkyOXRMMkV2UVVObk9HOWpTbFJqTTI5WmFrTXlSbWRJUld4emFuTjNjMUo1VTA5WmVrOWlUMDl2TmkxcFdVaE9aa3RWTUdsYVRtOHRVV05sZFhBOWN6azJMV01pTENKbGJXRnBiQ0k2SW0xaGVHRnVaSEp2YVdRME1rQm5iV0ZwYkM1amIyMGlMQ0psYldGcGJGOTJaWEpwWm1sbFpDSTZkSEoxWlN3aVpuVnNiRjl1WVcxbElqb2lUV0ZyYzJsdElFdG9kWHBwYmlJc0ltbHpjeUk2SW1oMGRIQnpPaTh2WVdOamIzVnVkSE11WjI5dloyeGxMbU52YlNJc0ltNWhiV1VpT2lKTllXdHphVzBnUzJoMWVtbHVJaXdpY0dodmJtVmZkbVZ5YVdacFpXUWlPbVpoYkhObExDSndhV04wZFhKbElqb2lhSFIwY0hNNkx5OXNhRE11WjI5dloyeGxkWE5sY21OdmJuUmxiblF1WTI5dEwyRXZRVU5uT0c5alNsUmpNMjlaYWtNeVJtZElSV3h6YW5OM2MxSjVVMDlaZWs5aVQwOXZOaTFwV1VoT1prdFZNR2xhVG04dFVXTmxkWEE5Y3prMkxXTWlMQ0p3Y205MmFXUmxjbDlwWkNJNklqRXdOek15T0RjMU1UYzNORGcwTURJMU9UazNOeUlzSW5OMVlpSTZJakV3TnpNeU9EYzFNVGMzTkRnME1ESTFPVGszTnlKOUxDSnliMnhsSWpvaVlYVjBhR1Z1ZEdsallYUmxaQ0lzSW1GaGJDSTZJbUZoYkRFaUxDSmhiWElpT2x0N0ltMWxkR2h2WkNJNkltOWhkWFJvSWl3aWRHbHRaWE4wWVcxd0lqb3hOelV6TmpJeE5qWXlmVjBzSW5ObGMzTnBiMjVmYVdRaU9pSXhaamhqTjJZMk9DMDJOakU1TFRSbU5XVXRZalF3Tnkwek5XTXhaVFkwTWpnd1l6VWlMQ0pwYzE5aGJtOXVlVzF2ZFhNaU9tWmhiSE5sZlEuLS0xNktMdUxxU1JCMElyUUpyM0dXejBxWUVlbG9XZ2xTZnU1VVVjYW1tSSIsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJleHBpcmVzX2luIjozNjAwLCJleHBpcmVzX2F0IjoxNzUzNjMwMjM2LCJyZWZyZXNoX3Rva2VuIjoiNTZxYjV2YmU3d2dnIiwidXNlciI6eyJpZCI6ImE2MjIyMjQ2LTBiNTMtNGJlMi1hOWUxLTQ5MGQxYWIwMDQ1OSIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoibWF4YW5kcm9pZDQyQGdtYWlsLmNvbSIsImVtYWlsX2NvbmZpcm1lZF9hdCI6IjIwMjUtMDctMjdUMDk6MDU6NTAuNTk0MzJaIiwicGhvbmUiOiIiLCJjb25maXJtZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjA1OjUwLjU5NDMyWiIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMDctMjdUMTM6MDc6NDIuOTMzNzA5WiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6Imdvb2dsZSIsInByb3ZpZGVycyI6WyJnb29nbGUiXX0sInVzZXJfbWV0YWRhdGEiOnsiYXZhdGFyX3VybCI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pUYzNvWWpDMkZnSEVsc2pzd3NSeVNPWXpPYk9PbzYtaVlITmZLVTBpWk5vLVFjZXVwPXM5Ni1jIiwiZW1haWwiOiJtYXhhbmRyb2lkNDJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6Ik1ha3NpbSBLaHV6aW4iLCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYW1lIjoiTWFrc2ltIEtodXppbiIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pUYzNvWWpDMkZnSEVsc2pzd3NSeVNPWXpPYk9PbzYtaVlITmZLVTBpWk5vLVFjZXVwPXM5Ni1jIiwicHJvdmlkZXJfaWQiOiIxMDczMjg3NTE3NzQ4NDAyNTk5NzciLCJzdWIiOiIxMDczMjg3NTE3NzQ4NDAyNTk5NzcifSwiaWRlbnRpdGllcyI6W3siaWRlbnRpdHlfaWQiOiJhZDBlZWJmZC1mODA3LTQwYzAtODU0My1iYmUzMjQ5ODc0YjEiLCJpZCI6IjEwNzMyODc1MTc3NDg0MDI1OTk3NyIsInVzZXJfaWQiOiJhNjIyMjI0Ni0wYjUzLTRiZTItYTllMS00O; Path=/, sb-kuruznkxdywvvwystdor-auth-token.1=TBkMWFiMDA0NTkiLCJpZGVudGl0eV9kYXRhIjp7ImF2YXRhcl91cmwiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKVGMzb1lqQzJGZ0hFbHNqc3dzUnlTT1l6T2JPT282LWlZSE5mS1UwaVpOby1RY2V1cD1zOTYtYyIsImVtYWlsIjoibWF4YW5kcm9pZDQyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJNYWtzaW0gS2h1emluIiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tIiwibmFtZSI6Ik1ha3NpbSBLaHV6aW4iLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKVGMzb1lqQzJGZ0hFbHNqc3dzUnlTT1l6T2JPT282LWlZSE5mS1UwaVpOby1RY2V1cD1zOTYtYyIsInByb3ZpZGVyX2lkIjoiMTA3MzI4NzUxNzc0ODQwMjU5OTc3Iiwic3ViIjoiMTA3MzI4NzUxNzc0ODQwMjU5OTc3In0sInByb3ZpZGVyIjoiZ29vZ2xlIiwibGFzdF9zaWduX2luX2F0IjoiMjAyNS0wNy0yN1QwOTowNTo1MC41ODU0NzZaIiwiY3JlYXRlZF9hdCI6IjIwMjUtMDctMjdUMDk6MDU6NTAuNTg1NTI4WiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA3LTI3VDEzOjA3OjQyLjM1NTM2NloiLCJlbWFpbCI6Im1heGFuZHJvaWQ0MkBnbWFpbC5jb20ifV0sImNyZWF0ZWRfYXQiOiIyMDI1LTA3LTI3VDA5OjA1OjUwLjU2NTgzM1oiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNy0yN1QxNDozMDozNi4xNjUxNjZaIiwiaXNfYW5vbnltb3VzIjpmYWxzZX19; Path=/'
+    }
+  }
+}
+ GET / 200 in 26ms
+ ✓ Compiled /_not-found in 207ms (1115 modules)
+ GET /dashboard 404 in 258ms
+ GET /_next/static/webpack/4114012bcd9a3cbb.webpack.hot-update.json 404 in 126ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/auth/callback/page.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/auth/callback/page' in /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/auth/callback/page.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/auth/callback/page' in '/Users/max/Documents/Coding/Jessie/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/auth/callback/page (expected /Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/auth/callback/page.js)
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at resolve commonjs /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/api/indexing/sync/route' in /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/api/indexing/sync/route.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/api/indexing/sync/route' in '/Users/max/Documents/Coding/Jessie/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/api/indexing/sync/route (expected /Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/api/indexing/sync/route.js)
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at resolve commonjs /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/auth/callback/page.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/auth/callback/page' in /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/auth/callback/page.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/auth/callback/page' in '/Users/max/Documents/Coding/Jessie/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/auth/callback/page (expected /Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/auth/callback/page.js)
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at resolve commonjs /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/api/indexing/sync/route' in /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/api/indexing/sync/route.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/api/indexing/sync/route' in '/Users/max/Documents/Coding/Jessie/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/api/indexing/sync/route (expected /Users/max/Documents/Coding/Jessie/apps/web/.next/server/app/api/indexing/sync/route.js)
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/handle-externals.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/bundle5.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/compiled/webpack/webpack.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/plugins/define-env-plugin.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/swc/index.js
+<w>  at file dependencies /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at file /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+<w>  at resolve commonjs /Users/max/Documents/Coding/Jessie/node_modules/next/dist/build/webpack/loaders/next-barrel-loader.js
+ ✓ Compiled in 70ms (483 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 42ms (483 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 102ms (1255 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 184ms (1126 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 83ms (1126 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 87ms (1126 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 122ms (1128 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 104ms (1130 modules)
+Dashboard page loading...
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+Dashboard session check: {
+  hasSession: true,
+  userId: 'a6222246-0b53-4be2-a9e1-490d1ab00459',
+  email: 'maxandroid42@gmail.com'
+}
+ ✓ Compiled in 62ms (485 modules)
+ ✓ Compiled in 68ms (485 modules)
+ ✓ Compiled in 101ms (1259 modules)
+[?25h

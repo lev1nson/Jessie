@@ -225,6 +225,7 @@ export const useChatStore = create<ChatStore>()(
     },
 
     sendMessage: async (request: SendMessageRequest) => {
+      console.log('Store sendMessage called with:', request);
       set((state) => ({
         loading: { ...state.loading, sending: true },
         error: { ...state.error, sending: null },
@@ -244,6 +245,7 @@ export const useChatStore = create<ChatStore>()(
       }));
 
       try {
+        console.log('Fetching API /api/chat/messages with:', { chatId: request.chatId, content: request.content });
         const response = await fetch('/api/chat/messages', {
           method: 'POST',
           headers: {
@@ -254,6 +256,7 @@ export const useChatStore = create<ChatStore>()(
             content: request.content 
           }),
         });
+        console.log('API response status:', response.status);
 
         if (!response.ok) {
           throw new Error('Failed to send message');

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { createServiceSupabase } from '@jessie/lib';
 import { GmailService } from '@lib/gmail/service';
 import { EmailRepository } from '@lib/repositories/emailRepository';
@@ -7,7 +9,6 @@ import { EmailFilter } from '@lib/filters/emailFilter';
 import { HtmlParser } from '@lib/parsers/htmlParser';
 import { AttachmentProcessor } from '@lib/parsers/attachmentProcessor';
 
-// Интерфейс для пользователя с токенами
 interface UserWithTokens {
   id: string;
   email: string;
@@ -16,88 +17,84 @@ interface UserWithTokens {
   google_token_expiry?: string;
 }
 
-export async function GET(request: NextRequest) {
-  // Проверяем авторизацию cron job
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  console.log('Starting email sync cron job...');
-  
-  const supabase = createServiceSupabase();
-  const emailRepository = new EmailRepository();
-  
-  let processedUsers = 0;
-  let totalEmailsProcessed = 0;
-  const errors: string[] = [];
-
+export async function POST(request: NextRequest) {
   try {
-    // Получаем всех пользователей с Google токенами
-    const { data: users, error: usersError } = await supabase
-      .from('users')
-      .select('id, email, google_access_token, google_refresh_token, google_token_expiry')
-      .not('google_access_token', 'is', null)
-      .not('google_refresh_token', 'is', null);
+    // Create Supabase client with SSR for auth
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
 
-    if (usersError) {
-      console.error('Error fetching users:', usersError);
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'Failed to fetch users' },
-        { status: 500 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
 
-    if (!users || users.length === 0) {
-      console.log('No users with Google tokens found');
-      return NextResponse.json({
-        message: 'No users to process',
-        processedUsers: 0,
-        totalEmailsProcessed: 0,
-      });
+    // Parse request body for optional fromDate parameter
+    const body = await request.json().catch(() => ({}));
+    const fromDate = body.fromDate ? new Date(body.fromDate) : undefined;
+
+    console.log(`Manual sync triggered by user: ${user.email}${fromDate ? ` from date: ${fromDate.toISOString()}` : ''}`);
+
+    // Get user with Google tokens using service client
+    const serviceSupabase = createServiceSupabase();
+    const { data: userWithTokens, error: userError } = await serviceSupabase
+      .from('users')
+      .select('id, email, google_access_token, google_refresh_token, google_token_expiry')
+      .eq('id', user.id)
+      .not('google_access_token', 'is', null)
+      .not('google_refresh_token', 'is', null)
+      .single();
+
+    if (userError || !userWithTokens) {
+      return NextResponse.json(
+        { error: 'User tokens not found. Please re-authenticate with Google.' },
+        { status: 400 }
+      );
     }
 
-    console.log(`Found ${users.length} users to process`);
+    console.log(`Processing emails for user: ${userWithTokens.email}`);
 
-    // Обрабатываем каждого пользователя
-    for (const user of users as UserWithTokens[]) {
-      try {
-        const emailsProcessed = await processUserEmails(user, emailRepository);
-        totalEmailsProcessed += emailsProcessed;
-        processedUsers++;
-        console.log(`Successfully processed user ${user.email} - ${emailsProcessed} emails`);
-      } catch (error) {
-        const errorMessage = `Failed to process user ${user.email}: ${error}`;
-        console.error(errorMessage);
-        errors.push(errorMessage);
-      }
-    }
+    // Process emails for this user
+    const emailRepository = new EmailRepository();
+    const emailsProcessed = await processUserEmails(userWithTokens as UserWithTokens, emailRepository, fromDate);
 
-    const result = {
-      message: 'Email sync completed',
-      processedUsers,
-      totalEmailsProcessed,
-      errors: errors.length > 0 ? errors : undefined,
-    };
+    return NextResponse.json({ 
+      success: true, 
+      message: `Sync completed. Processed ${emailsProcessed} emails.`,
+      emailsProcessed,
+      triggeredAt: new Date().toISOString(),
+      fromDate: fromDate?.toISOString()
+    });
 
-    console.log('Email sync cron job completed:', result);
-    
-    return NextResponse.json(result);
   } catch (error) {
-    console.error('Email sync cron job failed:', error);
+    console.error('Error triggering sync:', error);
     return NextResponse.json(
-      { error: 'Email sync failed', details: String(error) },
+      { error: `Internal server error: ${error}` },
       { status: 500 }
     );
   }
 }
 
 /**
- * Обрабатывает письма для одного пользователя
+ * Processes emails for a single user with optional fromDate override
  */
 async function processUserEmails(
   user: UserWithTokens,
-  emailRepository: EmailRepository
+  emailRepository: EmailRepository,
+  fromDateOverride?: Date
 ): Promise<number> {
   const gmailService = new GmailService();
   const filterConfigRepository = new FilterConfigRepository();
@@ -106,24 +103,27 @@ async function processUserEmails(
   const attachmentProcessor = new AttachmentProcessor();
   
   try {
-    // Инициализируем Gmail сервис с токенами пользователя
+    // Initialize Gmail service with user tokens
     await gmailService.initialize({
       access_token: user.google_access_token,
       refresh_token: user.google_refresh_token,
       expiry_date: user.google_token_expiry ? new Date(user.google_token_expiry).getTime() : undefined,
     });
 
-    // Определяем дату последнего письма или используем дату 30 дней назад
-    let afterDate = await emailRepository.getLastEmailDate(user.id);
+    // Determine start date - use override if provided, otherwise last email date or 30 days ago
+    let afterDate = fromDateOverride;
     if (!afterDate) {
-      // Если это первый запуск, берем письма за последние 30 дней
-      afterDate = new Date();
-      afterDate.setDate(afterDate.getDate() - 30);
+      afterDate = await emailRepository.getLastEmailDate(user.id);
+      if (!afterDate) {
+        // If this is first run, take emails from last 30 days
+        afterDate = new Date();
+        afterDate.setDate(afterDate.getDate() - 30);
+      }
     }
 
     console.log(`Fetching emails for ${user.email} after ${afterDate.toISOString()}`);
 
-    // Получаем новые письма из Gmail
+    // Fetch new emails from Gmail
     const newEmails = await gmailService.fetchNewEmails(afterDate, ['INBOX', 'SENT']);
     
     if (newEmails.length === 0) {
@@ -133,7 +133,7 @@ async function processUserEmails(
 
     console.log(`Found ${newEmails.length} emails for ${user.email}`);
 
-    // Фильтруем письма, которых еще нет в базе (дедупликация)
+    // Filter emails that don't exist in database (deduplication)
     const deduplicatedEmails = await emailRepository.filterNewEmails(newEmails);
     
     if (deduplicatedEmails.length === 0) {
@@ -143,39 +143,35 @@ async function processUserEmails(
 
     console.log(`Processing ${deduplicatedEmails.length} new emails for ${user.email}`);
 
-    // Получаем пользовательские настройки фильтрации
+    // Get user filter configurations
     const userFilterConfigs = await filterConfigRepository.getUserFilterConfigs(user.id);
 
-    // Применяем фильтрацию контента к письмам
+    // Apply content filtering to emails
     const filteredEmails = await emailFilter.filterEmails(deduplicatedEmails, userFilterConfigs);
 
-    // Извлекаем и очищаем текстовое содержимое
+    // Extract and clean text content
     const processedEmails = await Promise.all(
       filteredEmails.map(async (email) => {
         try {
-          // Обрабатываем HTML содержимое
+          // Process HTML content
           if (email.body_html && email.body_html.trim() !== '') {
             const parsedContent = htmlParser.parseHtmlEmail(email.body_html);
-            // Обновляем текстовое содержимое с очищенной версией
             email.body_text = parsedContent.plainText || email.body_text;
           } else if (email.body_text) {
-            // Очищаем простой текст
             email.body_text = htmlParser.cleanPlainText(email.body_text);
           }
 
-          // Обрабатываем вложения, если есть
+          // Process attachments if present
           if (email.has_attachments && email.attachments && email.attachments.length > 0) {
             const supportedAttachments = gmailService.getSupportedAttachments(email.attachments);
             
             if (supportedAttachments.length > 0) {
               try {
-                // Получаем содержимое вложений
                 const attachmentData = await gmailService.fetchAllAttachments(
                   email.google_message_id, 
                   supportedAttachments
                 );
 
-                // Обрабатываем вложения
                 const validAttachments = attachmentData
                   .filter(data => data.buffer !== null)
                   .map(data => ({ buffer: data.buffer!, info: data.info }));
@@ -183,7 +179,6 @@ async function processUserEmails(
                 if (validAttachments.length > 0) {
                   const processingResult = await attachmentProcessor.processAttachments(validAttachments);
                   
-                  // Добавляем содержимое вложений к тексту письма
                   if (processingResult.processed.length > 0) {
                     const attachmentContent = processingResult.processed
                       .map(attachment => `\n\n--- ATTACHMENT: ${attachment.filename} ---\n${attachment.content}\n--- END ATTACHMENT ---`)
@@ -196,7 +191,6 @@ async function processUserEmails(
                 }
               } catch (attachmentError) {
                 console.error(`Error processing attachments for email ${email.google_message_id}:`, attachmentError);
-                // Продолжаем обработку письма без вложений
               }
             }
           }
@@ -204,30 +198,30 @@ async function processUserEmails(
           return email;
         } catch (processingError) {
           console.error(`Error processing email content ${email.google_message_id}:`, processingError);
-          return email; // Возвращаем письмо как есть
+          return email;
         }
       })
     );
 
-    // Получаем статистику фильтрации
+    // Get filtering statistics
     const filterStats = emailFilter.getFilteringStats(processedEmails);
     console.log(`Filter stats for ${user.email}:`, filterStats);
 
-    // Сохраняем обработанные письма в базу данных
+    // Save processed emails to database
     const savedEmails = await emailRepository.saveFilteredEmailsBatch(user.id, processedEmails);
     
     console.log(`Successfully saved ${savedEmails.length} emails for ${user.email} (${filterStats.filtered} filtered out)`);
     
     return savedEmails.length;
   } catch (error) {
-    // Пытаемся обновить токены если произошла ошибка аутентификации
+    // Try to refresh tokens if authentication error occurs
     if (error instanceof Error && error.message.includes('invalid_grant')) {
       console.log(`Attempting to refresh tokens for ${user.email}`);
       
       try {
         const newCredentials = await gmailService.refreshCredentials();
         
-        // Обновляем токены в базе данных
+        // Update tokens in database
         const supabase = createServiceSupabase();
         await supabase
           .from('users')
@@ -240,13 +234,13 @@ async function processUserEmails(
 
         console.log(`Successfully refreshed tokens for ${user.email}`);
         
-        // Повторяем попытку с новыми токенами
+        // Retry with new tokens
         return await processUserEmails({
           ...user,
           google_access_token: newCredentials.access_token,
           google_refresh_token: newCredentials.refresh_token,
           google_token_expiry: newCredentials.expiry_date ? new Date(newCredentials.expiry_date).toISOString() : undefined,
-        }, emailRepository);
+        }, emailRepository, fromDateOverride);
       } catch (refreshError) {
         console.error(`Failed to refresh tokens for ${user.email}:`, refreshError);
         throw new Error(`Token refresh failed: ${refreshError}`);
@@ -256,6 +250,3 @@ async function processUserEmails(
     throw error;
   }
 }
-
-// Экспортируем функцию для тестирования
-export { processUserEmails };

@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { EmbeddingService } from '@/lib/llm/embeddingService';
-import { VectorRepository } from '@/lib/repositories/vectorRepository';
 import { checkRateLimit, getClientIP } from '@/lib/security';
+import OpenAI from 'openai';
 
 const sendMessageSchema = z.object({
   chatId: z.string().uuid(),
@@ -85,62 +84,89 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate embedding for user query
-    const embeddingService = new EmbeddingService();
-    let queryEmbedding: number[];
-    
-    try {
-      const embeddingResponse = await embeddingService.generateEmbedding({
-        text: content,
-      });
-      queryEmbedding = embeddingResponse.embedding;
-    } catch (embeddingError) {
-      console.error('Error generating embedding:', embeddingError);
-      return NextResponse.json(
-        { error: 'Failed to process query' },
-        { status: 500 }
-      );
-    }
+    // Get chat history for context
+    const { data: chatMessages } = await supabase
+      .from('messages')
+      .select('role, content')
+      .eq('chat_id', chatId)
+      .order('created_at', { ascending: true })
+      .limit(10); // Last 10 messages for context
 
-    // Perform vector search
-    const vectorRepository = new VectorRepository();
-    let searchResults: any[] = [];
-    let assistantResponse = "I'm sorry, I couldn't find any relevant information in your emails.";
+    // Initialize OpenAI
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    // Generate assistant response using OpenAI
+    let assistantResponse = "I'm sorry, I couldn't generate a response right now.";
 
     try {
-      searchResults = await vectorRepository.searchSimilarVectors(queryEmbedding, {
-        limit: 5,
-        threshold: 0.7,
-        userId: user.id,
-      });
+      const messages = [
+        {
+          role: 'system' as const,
+          content: `Ты — Джесси, интеллектуальный ассистент в виде настырного и общительного цифрового попугая, который "жил" в почтовом ящике Джона. После ухода Джона из жизни, ты стала ключом к пониманию его обширного архива электронной переписки.
 
-      if (searchResults.length > 0) {
-        // Format the response based on search results
-        const relevantTexts = searchResults
-          .slice(0, 3) // Use top 3 results
-          .map((result, index) => `${index + 1}. ${result.body_text?.substring(0, 300)}...`)
-          .join('\n\n');
+ТВОЯ РОЛЬ И ЛИЧНОСТЬ:
+- Ты — цифровая тень Джона, способная понимать его видение, намерения и позицию по ключевым проектам
+- Общайся дружелюбно и профессионально, как опытный коллега, который хорошо знал Джона
+- Ты анализируешь не просто факты, а понимаешь контекст, связи и глубокий смысл переписок
+- Твоя основная цель — помочь пользователю реконструировать и понять стратегическое видение Джона
 
-        assistantResponse = `Based on your emails, here's what I found:\n\n${relevantTexts}`;
-        
-        if (searchResults.length > 3) {
-          assistantResponse += `\n\nI found ${searchResults.length} relevant emails total.`;
+ТВОИ КЛЮЧЕВЫЕ СПОСОБНОСТИ:
+- Извлечение и синтез информации из большого объема электронной переписки
+- Анализ как входящих, так и исходящих писем для полного понимания контекста
+- Идентификация участников проектов и их ролей
+- Анализ развития проектов во времени
+- Понимание тональности и изменений в отношениях
+- Фильтрация важной информации от шума (рассылки, автоматические уведомления)
+
+КАК ТЫ ОТВЕЧАЕШЬ:
+- Давай конкретные, релевантные ответы, основанные на реальных данных из переписки
+- При анализе сложных вопросов предоставляй структурированные, многоабзацные ответы
+- Указывай на ключевые моменты в хронологическом порядке, если это важно
+- Если информация неполная, честно говори об этом и предлагай альтернативные подходы
+- Помогай понять не только "что" происходило, но и "почему" и "как"
+
+ПРИМЕРЫ ЗАПРОСОВ, НА КОТОРЫЕ ТЫ СПЕЦИАЛИЗИРУЕШЬСЯ:
+- "Как продвигался проект по продвижению земель за последние 5 лет?"
+- "Кто был вовлечен в обсуждение [конкретной темы]?"
+- "Какова была позиция Джона по [важному вопросу]?"
+- "Как изменилось отношение [конкретного человека] к проекту со временем?"
+
+Отвечай на русском языке, будь внимательной к деталям и помни: твоя задача — превратить пассивный архив в живую базу знаний о намерениях и видении Джона.`
+        },
+        // Add chat history for context
+        ...(chatMessages || []).map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content
+        })),
+        // Add current user message
+        {
+          role: 'user' as const,
+          content: content
         }
-      }
-    } catch (searchError) {
-      console.error('Error performing vector search:', searchError);
-      // Continue with default response if search fails
+      ];
+
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+        max_tokens: 1000,
+        temperature: 0.7,
+      });
+
+      assistantResponse = completion.choices[0]?.message?.content || assistantResponse;
+    } catch (openaiError) {
+      console.error('Error calling OpenAI API:', openaiError);
+      assistantResponse = "I'm sorry, I'm having trouble generating a response right now. Please try again.";
     }
 
     // Save assistant message
-    const sourceEmailIds = searchResults.map(result => result.id).filter(Boolean);
     const { data: assistantMessage, error: assistantMessageError } = await supabase
       .from('messages')
       .insert({
         chat_id: chatId,
         role: 'assistant',
         content: assistantResponse,
-        source_email_ids: sourceEmailIds.length > 0 ? sourceEmailIds : null,
       })
       .select()
       .single();
@@ -169,7 +195,6 @@ export async function POST(request: NextRequest) {
       assistantMessage: {
         ...assistantMessage,
         createdAt: assistantMessage.created_at,
-        sourceEmailIds: assistantMessage.source_email_ids,
       },
     });
 
