@@ -31,7 +31,7 @@ export function ChatList({
   loading = false 
 }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [, setFocusedIndex] = useState(-1);
 
   const filteredChats = useMemo(() => {
     if (!searchQuery.trim()) return chats;

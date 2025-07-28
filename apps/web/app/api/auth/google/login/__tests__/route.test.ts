@@ -30,7 +30,7 @@ vi.mock('next/headers', () => ({
   })),
 }));
 
-vi.mock('@lib/security', () => ({
+vi.mock('@/lib/security', () => ({
   checkRateLimit: vi.fn(() => ({ allowed: true, remaining: 4, resetTime: Date.now() + 60000 })),
   getClientIP: vi.fn(() => '127.0.0.1'),
   validateRedirectUrl: vi.fn(() => true),
@@ -60,7 +60,7 @@ beforeEach(async () => {
   mockCookiesSet.mockImplementation(() => {});
   
   // Reset security mocks to default values
-  const { checkRateLimit, validateRedirectUrl, getClientIP, secureLog } = await import('@lib/security');
+  const { checkRateLimit, validateRedirectUrl, getClientIP, secureLog } = await import('@/lib/security');
   (checkRateLimit as any).mockReturnValue({ allowed: true, remaining: 4, resetTime: Date.now() + 60000 });
   (validateRedirectUrl as any).mockReturnValue(true);
   (getClientIP as any).mockReturnValue('127.0.0.1');
@@ -110,7 +110,7 @@ describe('/api/auth/google/login', () => {
     });
 
     it('should handle invalid redirect URL', async () => {
-      const { validateRedirectUrl } = await import('@lib/security');
+      const { validateRedirectUrl } = await import('@/lib/security');
       (validateRedirectUrl as any).mockReturnValue(false);
 
       const request = new NextRequest('http://localhost:3000/api/auth/google/login', {
@@ -129,7 +129,7 @@ describe('/api/auth/google/login', () => {
     });
 
     it('should handle rate limiting', async () => {
-      const { checkRateLimit } = await import('@lib/security');
+      const { checkRateLimit } = await import('@/lib/security');
       (checkRateLimit as any).mockReturnValue({ 
         allowed: false, 
         remaining: 0, 

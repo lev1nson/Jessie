@@ -7,7 +7,7 @@ import {
   getClientIP, 
   validateRedirectUrl,
   secureLog
-} from '@lib/security';
+} from '@/lib/security';
 
 const LoginRequestSchema = z.object({
   redirectTo: z.string().url().optional(),
@@ -79,7 +79,8 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const finalRedirectTo = redirectTo || `${process.env.NEXTAUTH_URL}/auth/callback`;
+    const oauthCallbackUrl = `${process.env.NEXTAUTH_URL}/api/auth/google/callback`;
+    const finalRedirectTo = redirectTo || `${process.env.NEXTAUTH_URL}/dashboard`;
 
     console.log('Initiating OAuth with Supabase', {
       provider: 'google',
@@ -91,10 +92,11 @@ export async function POST(request: NextRequest) {
       provider: 'google',
       options: {
         scopes: 'email profile https://www.googleapis.com/auth/gmail.readonly',
-        redirectTo: finalRedirectTo,
+        redirectTo: oauthCallbackUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
+          state: encodeURIComponent(finalRedirectTo),
         },
       },
     });

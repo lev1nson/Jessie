@@ -35,44 +35,40 @@
 74:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 83:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 92:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-194:13  Error: 'result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
-330:13  Error: 'result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/cron/email-sync/route.ts
+272:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/features/auth/AuthGuard.test.tsx
+39:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+40:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+156:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./components/features/auth/AuthStatus.test.tsx
 21:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 21:45  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
-./components/features/chat/ChatInterface.tsx
-55:21  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
-55:69  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
-58:21  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
-58:58  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
-61:21  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
-61:69  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+./components/features/chat/ChatList.test.tsx
+7:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
-./components/ui/input.tsx
-5:18  Error: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-object-type
+./components/features/chat/ChatMessages.test.tsx
+17:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/features/chat/ChatMessages.tsx
+10:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/__tests__/performance.test.ts
-1:48  Error: 'afterEach' is defined but never used.  @typescript-eslint/no-unused-vars
-3:10  Error: 'PdfParser' is defined but never used.  @typescript-eslint/no-unused-vars
-4:10  Error: 'DocxParser' is defined but never used.  @typescript-eslint/no-unused-vars
-5:10  Error: 'AttachmentProcessor' is defined but never used.  @typescript-eslint/no-unused-vars
-367:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+364:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/__tests__/vectorizationIntegration.test.ts
-3:8  Error: 'EmbeddingService' is defined but never used.  @typescript-eslint/no-unused-vars
-5:8  Error: 'VectorRepository' is defined but never used.  @typescript-eslint/no-unused-vars
-6:10  Error: 'AttachmentProcessor' is defined but never used.  @typescript-eslint/no-unused-vars
-15:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-16:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-17:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+12:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+13:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/__tests__/vectorizationPerformance.test.ts
-3:8  Error: 'EmbeddingService' is defined but never used.  @typescript-eslint/no-unused-vars
-5:8  Error: 'VectorRepository' is defined but never used.  @typescript-eslint/no-unused-vars
-14:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-15:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+12:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+13:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/filters/__tests__/domainFilter.test.ts
 334:7  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
@@ -125,18 +121,8 @@
 524:7  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
 537:7  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
 
-./lib/parsers/__tests__/docxParser.test.ts
-2:22  Error: 'DocxParseResult' is defined but never used.  @typescript-eslint/no-unused-vars
-
-./lib/parsers/__tests__/htmlParser.test.ts
-2:22  Error: 'ParsedContent' is defined but never used.  @typescript-eslint/no-unused-vars
-
-./lib/parsers/__tests__/pdfParser.test.ts
-2:21  Error: 'PdfParseResult' is defined but never used.  @typescript-eslint/no-unused-vars
-
 ./lib/parsers/docxParser.ts
 37:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-189:23  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
 194:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 194:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 201:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -152,9 +138,6 @@
 227:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 227:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
-./lib/parsers/htmlParser.ts
-188:50  Error: 'originalHtml' is defined but never used.  @typescript-eslint/no-unused-vars
-
 ./lib/parsers/pdfParser.ts
 156:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
@@ -165,8 +148,14 @@
 ./lib/repositories/__tests__/vectorRepository.test.ts
 12:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 33:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-325:13  Error: 'mockTotalFrom' is assigned a value but never used.  @typescript-eslint/no-unused-vars
-335:13  Error: 'mockVectorizedFrom' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./lib/repositories/vectorRepository.ts
+7:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+8:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+15:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+40:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+41:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/services/__tests__/vectorizationService.test.ts
 16:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -182,27 +171,19 @@
 449:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 461:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
-./lib/services/asyncAttachmentProcessor.ts
-55:42  Error: 'reject' is defined but never used.  @typescript-eslint/no-unused-vars
-59:20  Error: 'results' is defined but never used.  @typescript-eslint/no-unused-vars
+./lib/services/vectorizationService.ts
+89:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/stores/chatStore.test.ts
+46:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+47:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+104:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+105:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+155:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+239:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/utils/__tests__/filterCache.test.ts
 25:70  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-72:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-101:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-123:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-170:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-189:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-226:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-248:13  Error: 'midMemory' is assigned a value but never used.  @typescript-eslint/no-unused-vars
-270:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-307:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-348:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-378:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-406:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-431:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-462:31  Error: A `require()` style import is forbidden.  @typescript-eslint/no-require-imports
-470:11  Error: 'stats' is never reassigned. Use 'const' instead.  prefer-const
 
 ./lib/utils/vectorizationCache.ts
 3:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any

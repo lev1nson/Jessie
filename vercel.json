@@ -14,7 +14,7 @@
   "crons": [
     {
       "path": "/api/cron/email-sync",
-      "schedule": "0 0 * * *"
+      "schedule": "0 * * * *"
     }
   ],
   "env": {

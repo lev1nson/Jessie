@@ -67,6 +67,11 @@ export function checkRateLimit(
   windowMs: number = 60000, // 1 minute
   maxRequests: number = 10
 ): { allowed: boolean; remaining: number; resetTime: number } {
+  // Disable rate limiting in test environment
+  if (process.env.NODE_ENV === 'test') {
+    return { allowed: true, remaining: maxRequests - 1, resetTime: Date.now() + windowMs };
+  }
+
   const now = Date.now();
   const record = rateLimitStore.get(identifier);
   

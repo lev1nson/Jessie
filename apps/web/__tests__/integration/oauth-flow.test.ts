@@ -23,7 +23,7 @@ vi.mock('next/headers', () => ({
   })),
 }));
 
-vi.mock('@lib/security', () => ({
+vi.mock('@/lib/security', () => ({
   checkRateLimit: vi.fn(),
   getClientIP: vi.fn(() => '127.0.0.1'),
   validateRedirectUrl: vi.fn(() => true),
@@ -55,7 +55,7 @@ describe('OAuth Integration Flow', () => {
 
   describe('Complete OAuth Flow', () => {
     it('should complete full OAuth flow successfully', async () => {
-      const { checkRateLimit, UserValidationSchema } = await import('@lib/security');
+      const { checkRateLimit, UserValidationSchema } = await import('@/lib/security');
       
       // Set up mocks for successful flow
       (checkRateLimit as any).mockReturnValue({ 
@@ -147,7 +147,7 @@ describe('OAuth Integration Flow', () => {
     });
 
     it('should handle OAuth flow with errors', async () => {
-      const { checkRateLimit } = await import('@lib/security');
+      const { checkRateLimit } = await import('@/lib/security');
       
       // Set up mocks for error flow
       (checkRateLimit as any).mockReturnValue({ 
@@ -178,7 +178,7 @@ describe('OAuth Integration Flow', () => {
     });
 
     it('should handle rate limiting across the flow', async () => {
-      const { checkRateLimit } = await import('@lib/security');
+      const { checkRateLimit } = await import('@/lib/security');
       
       // Set up mocks for rate limiting
       (checkRateLimit as any).mockReturnValue({ 

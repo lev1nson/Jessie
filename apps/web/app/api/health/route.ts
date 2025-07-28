@@ -1,0 +1,91 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase-server';
+
+export async function GET() {
+  try {
+    // Check database connection
+    const supabase = createClient();
+    const { error: dbError } = await supabase
+      .from('users')
+      .select('count')
+      .limit(1);
+
+    if (dbError) {
+      return NextResponse.json(
+        {
+          status: 'error',
+          message: 'Database connection failed',
+          error: dbError.message,
+          timestamp: new Date().toISOString(),
+        },
+        { status: 500 }
+      );
+    }
+
+    // Check required environment variables
+    const requiredEnvVars = [
+      'NEXT_PUBLIC_SUPABASE_URL',
+      'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'GOOGLE_CLIENT_ID',
+      'GOOGLE_CLIENT_SECRET',
+      'OPENAI_API_KEY',
+      'NEXTAUTH_SECRET',
+      'CRON_SECRET',
+    ];
+
+    const missingEnvVars = requiredEnvVars.filter(
+      (envVar) => !process.env[envVar]
+    );
+
+    const envStatus = missingEnvVars.length === 0 ? 'ok' : 'warning';
+    
+    // Basic OpenAI API check (without making actual request)
+    const openaiConfigured = !!process.env.OPENAI_API_KEY;
+    
+    // Google OAuth check
+    const googleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
+    return NextResponse.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      components: {
+        database: {
+          status: 'ok',
+          message: 'Supabase connection successful'
+        },
+        environment: {
+          status: envStatus,
+          missing: missingEnvVars,
+          configured: requiredEnvVars.length - missingEnvVars.length,
+          total: requiredEnvVars.length
+        },
+        services: {
+          openai: {
+            status: openaiConfigured ? 'ok' : 'error',
+            message: openaiConfigured ? 'API key configured' : 'API key missing'
+          },
+          google: {
+            status: googleConfigured ? 'ok' : 'error', 
+            message: googleConfigured ? 'OAuth configured' : 'OAuth credentials missing'
+          }
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Health check failed:', error);
+    
+    return NextResponse.json(
+      {
+        status: 'error',
+        message: 'Health check failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    );
+  }
+}

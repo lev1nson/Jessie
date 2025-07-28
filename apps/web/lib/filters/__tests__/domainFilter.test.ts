@@ -331,7 +331,7 @@ describe('DomainFilter', () => {
     });
 
     it('should handle undefined/null values gracefully', () => {
-      // @ts-ignore - Testing runtime behavior
+      // @ts-expect-error - Testing runtime behavior
       const result = domainFilter.filterEmail(null, undefined, '');
       expect(result.isFiltered).toBe(false);
     });

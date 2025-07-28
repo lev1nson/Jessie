@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Ensure user exists in users table
-    const { data: existingUser, error: userCheckError } = await supabase
+    const { error: userCheckError } = await supabase
       .from('users')
       .select('id')
       .eq('id', user.id)

@@ -315,29 +315,27 @@ describe('VectorRepository', () => {
     it('should return vectorization statistics', async () => {
       const userId = 'user-123';
       
-      // Mock total emails query
-      const mockTotalSelect = vi.fn().mockResolvedValue({ 
+      // Mock total emails query chain: from().select().eq().eq()
+      const mockTotalEq2 = vi.fn().mockResolvedValue({ 
         data: [{ id: '1' }, { id: '2' }, { id: '3' }], 
         error: null 
       });
-      const mockTotalEq2 = vi.fn().mockReturnValue({ select: mockTotalSelect });
       const mockTotalEq1 = vi.fn().mockReturnValue({ eq: mockTotalEq2 });
-      const mockTotalFrom = vi.fn().mockReturnValue({ eq: mockTotalEq1 });
+      const mockTotalSelect = vi.fn().mockReturnValue({ eq: mockTotalEq1 });
       
-      // Mock vectorized emails query
-      const mockVectorizedSelect = vi.fn().mockResolvedValue({ 
+      // Mock vectorized emails query chain: from().select().eq().eq().not()
+      const mockVectorizedNot = vi.fn().mockResolvedValue({ 
         data: [{ id: '1' }], 
         error: null 
       });
-      const mockVectorizedNot = vi.fn().mockReturnValue({ select: mockVectorizedSelect });
       const mockVectorizedEq2 = vi.fn().mockReturnValue({ not: mockVectorizedNot });
       const mockVectorizedEq1 = vi.fn().mockReturnValue({ eq: mockVectorizedEq2 });
-      const mockVectorizedFrom = vi.fn().mockReturnValue({ eq: mockVectorizedEq1 });
+      const mockVectorizedSelect = vi.fn().mockReturnValue({ eq: mockVectorizedEq1 });
 
-      // Mock client.from to return different mocks for different calls
+      // Mock client.from to return different query chains for different calls
       mockSupabaseClient.from = vi.fn()
-        .mockReturnValueOnce({ eq: mockTotalEq1 })
-        .mockReturnValueOnce({ eq: mockVectorizedEq1 });
+        .mockReturnValueOnce({ select: mockTotalSelect })
+        .mockReturnValueOnce({ select: mockVectorizedSelect });
 
       const stats = await vectorRepository.getVectorizationStats(userId);
 
@@ -353,22 +351,20 @@ describe('VectorRepository', () => {
     it('should handle zero counts', async () => {
       const userId = 'user-123';
 
-      // Mock total emails query: from().select().eq().eq()
+      // Mock total emails query chain: from().select().eq().eq()
       const mockTotalEq2 = vi.fn().mockResolvedValue({ data: [], error: null });
       const mockTotalEq1 = vi.fn().mockReturnValue({ eq: mockTotalEq2 });
       const mockTotalSelect = vi.fn().mockReturnValue({ eq: mockTotalEq1 });
-      const mockTotalFrom = vi.fn().mockReturnValue({ select: mockTotalSelect });
       
-      // Mock vectorized emails query: from().select().eq().eq().not()
+      // Mock vectorized emails query chain: from().select().eq().eq().not()
       const mockVectorizedNot = vi.fn().mockResolvedValue({ data: [], error: null });
       const mockVectorizedEq2 = vi.fn().mockReturnValue({ not: mockVectorizedNot });
       const mockVectorizedEq1 = vi.fn().mockReturnValue({ eq: mockVectorizedEq2 });
       const mockVectorizedSelect = vi.fn().mockReturnValue({ eq: mockVectorizedEq1 });
-      const mockVectorizedFrom = vi.fn().mockReturnValue({ select: mockVectorizedSelect });
 
       mockSupabaseClient.from = vi.fn()
-        .mockReturnValueOnce(mockTotalFrom)
-        .mockReturnValueOnce(mockVectorizedFrom);
+        .mockReturnValueOnce({ select: mockTotalSelect })
+        .mockReturnValueOnce({ select: mockVectorizedSelect });
 
       const stats = await vectorRepository.getVectorizationStats(userId);
 
@@ -390,10 +386,9 @@ describe('VectorRepository', () => {
       const mockTotalEq2 = vi.fn().mockResolvedValue({ data: null, error });
       const mockTotalEq1 = vi.fn().mockReturnValue({ eq: mockTotalEq2 });
       const mockTotalSelect = vi.fn().mockReturnValue({ eq: mockTotalEq1 });
-      const mockTotalFrom = vi.fn().mockReturnValue({ select: mockTotalSelect });
       
       // Only mock the first call since it should fail before the second
-      mockSupabaseClient.from = vi.fn().mockReturnValue(mockTotalFrom);
+      mockSupabaseClient.from = vi.fn().mockReturnValue({ select: mockTotalSelect });
 
       await expect(vectorRepository.getVectorizationStats(userId))
         .rejects.toThrow('Failed to get total emails count: Total count error');

@@ -36,7 +36,7 @@ describe('/api/chats', () => {
     vi.clearAllMocks();
     
     // Setup default mocks
-    mockSupabaseFrom.mockImplementation((_table) => {
+    mockSupabaseFrom.mockImplementation(() => {
       const chainable = {
         select: mockSupabaseSelect,
         insert: mockSupabaseInsert,

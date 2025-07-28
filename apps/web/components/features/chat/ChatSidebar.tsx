@@ -1,16 +1,16 @@
 'use client';
 
-import { ChatList, type Chat } from './ChatList';
+import { ChatList } from './ChatList';
 import { AuthStatus } from '../auth/AuthStatus';
 import { useChat } from '../../../hooks/useChat';
 import { Settings } from 'lucide-react';
 import Link from 'next/link';
 
-interface ChatSidebarProps {
-  className?: string;
-}
+// interface ChatSidebarProps {
+//   className?: string;
+// }
 
-export function ChatSidebar({ className }: ChatSidebarProps) {
+export function ChatSidebar() {
   const { 
     chats, 
     activeChat, 

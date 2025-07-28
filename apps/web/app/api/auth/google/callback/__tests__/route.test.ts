@@ -32,7 +32,7 @@ vi.mock('next/headers', () => ({
   })),
 }));
 
-vi.mock('@lib/security', () => ({
+vi.mock('@/lib/security', () => ({
   checkRateLimit: vi.fn(() => ({ allowed: true, remaining: 9, resetTime: Date.now() + 60000 })),
   getClientIP: vi.fn(() => '127.0.0.1'),
   validateRedirectUrl: vi.fn(() => true),
@@ -131,7 +131,7 @@ describe('/api/auth/google/callback', () => {
 
     it('should handle user data validation failure', async () => {
       const { createServerClient } = await import('@supabase/ssr');
-      const { UserValidationSchema } = await import('@lib/security');
+      const { UserValidationSchema } = await import('@/lib/security');
       
       const mockSupabase = createServerClient('', '', {} as any);
       
@@ -163,7 +163,7 @@ describe('/api/auth/google/callback', () => {
     });
 
     it('should handle rate limiting', async () => {
-      const { checkRateLimit } = await import('@lib/security');
+      const { checkRateLimit } = await import('@/lib/security');
       (checkRateLimit as any).mockReturnValue({ 
         allowed: false, 
         remaining: 0, 
@@ -182,7 +182,7 @@ describe('/api/auth/google/callback', () => {
 
     it('should validate redirect state parameter', async () => {
       const { createServerClient } = await import('@supabase/ssr');
-      const { validateRedirectUrl, checkRateLimit, UserValidationSchema, secureLog } = await import('@lib/security');
+      const { validateRedirectUrl, checkRateLimit, UserValidationSchema, secureLog } = await import('@/lib/security');
       
       const mockSupabase = createServerClient('', '', {} as any);
       
