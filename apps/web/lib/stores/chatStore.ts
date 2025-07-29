@@ -2,7 +2,35 @@
 
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { Chat, Message, ChatState, CreateChatRequest, SendMessageRequest } from '../types/chat';
+import { Chat, Message, ChatState, CreateChatRequest, SendMessageRequest, RetryConfig } from '../types/chat';
+
+// Retry configuration
+const RETRY_CONFIG: RetryConfig = {
+  maxRetries: 3,
+  retryDelays: [1000, 2000, 4000], // 1s, 2s, 4s delays
+};
+
+// Helper function to determine if error is rate limiting
+const isRateLimitError = (error: unknown): boolean => {
+  if (error instanceof Error) {
+    return error.message.includes('rate limit') || 
+           error.message.includes('too many requests') ||
+           error.message.includes('429');
+  }
+  return false;
+};
+
+// Helper function to extract error message
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return 'An unexpected error occurred';
+};
+
+// Helper function to wait for a specified delay
+const wait = (ms: number): Promise<void> => 
+  new Promise(resolve => setTimeout(resolve, ms));
 
 interface ChatActions {
   // Chat management
@@ -15,6 +43,8 @@ interface ChatActions {
   // Message management
   loadMessages: (chatId: string) => Promise<void>;
   sendMessage: (request: SendMessageRequest) => Promise<void>;
+  sendMessageWithRetry: (userMessageId: string, request: SendMessageRequest, retryCount: number) => Promise<void>;
+  retryMessage: (messageId: string) => Promise<void>;
   
   // UI state management
   clearError: (type: 'chats' | 'messages' | 'sending') => void;
@@ -226,26 +256,32 @@ export const useChatStore = create<ChatStore>()(
 
     sendMessage: async (request: SendMessageRequest) => {
       console.log('Store sendMessage called with:', request);
-      set((state) => ({
-        loading: { ...state.loading, sending: true },
-        error: { ...state.error, sending: null },
-      }));
-
-      // Optimistically add user message
+      
+      const userMessageId = `temp-${Date.now()}`;
       const userMessage: Message = {
-        id: `temp-${Date.now()}`,
+        id: userMessageId,
         chatId: request.chatId,
         role: 'user',
         content: request.content,
         createdAt: new Date(),
+        status: 'pending',
+        retryCount: 0,
       };
 
+      // Add optimistic user message
       set((state) => ({
         messages: [...state.messages, userMessage],
+        loading: { ...state.loading, sending: true },
+        error: { ...state.error, sending: null },
       }));
 
+      return get().sendMessageWithRetry(userMessageId, request, 0);
+    },
+
+    sendMessageWithRetry: async (userMessageId: string, request: SendMessageRequest, retryCount: number) => {
       try {
-        console.log('Fetching API /api/chat/messages with:', { chatId: request.chatId, content: request.content });
+        console.log(`Attempt ${retryCount + 1} for message ${userMessageId}`);
+        
         const response = await fetch('/api/chat/messages', {
           method: 'POST',
           headers: {
@@ -256,10 +292,11 @@ export const useChatStore = create<ChatStore>()(
             content: request.content 
           }),
         });
-        console.log('API response status:', response.status);
 
         if (!response.ok) {
-          throw new Error('Failed to send message');
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+          throw new Error(errorMessage);
         }
 
         const { message, assistantMessage, sources } = await response.json();
@@ -268,22 +305,23 @@ export const useChatStore = create<ChatStore>()(
         const transformedMessage = {
           ...message,
           createdAt: new Date(message.createdAt),
+          status: 'sent' as const,
         };
         
         const transformedAssistantMessage = assistantMessage ? {
           ...assistantMessage,
           createdAt: new Date(assistantMessage.createdAt),
-          sources: sources || [], // Add sources to assistant message
+          sources: sources || [],
         } : null;
 
+        // Success - update messages and clear loading state
         set((state) => ({
           messages: [
-            ...state.messages.filter(m => m.id !== userMessage.id),
+            ...state.messages.filter(m => m.id !== userMessageId),
             transformedMessage,
             ...(transformedAssistantMessage ? [transformedAssistantMessage] : []),
           ],
           loading: { ...state.loading, sending: false },
-          // Update chat's last message and updatedAt
           chats: state.chats.map(chat =>
             chat.id === request.chatId
               ? {
@@ -294,17 +332,92 @@ export const useChatStore = create<ChatStore>()(
               : chat
           ),
         }));
+
       } catch (error) {
-        // Remove optimistic message on error
-        set((state) => ({
-          messages: state.messages.filter(m => m.id !== userMessage.id),
-          loading: { ...state.loading, sending: false },
-          error: { 
-            ...state.error, 
-            sending: error instanceof Error ? error.message : 'Failed to send message' 
-          },
-        }));
+        const errorMessage = getErrorMessage(error);
+        const isRateLimit = isRateLimitError(error);
+        
+        // Check if we should retry
+        if (retryCount < RETRY_CONFIG.maxRetries) {
+          const nextRetryCount = retryCount + 1;
+          const delay = RETRY_CONFIG.retryDelays[retryCount] || RETRY_CONFIG.retryDelays[RETRY_CONFIG.retryDelays.length - 1];
+          
+          // Update message status to show retry attempt
+          set((state) => ({
+            messages: state.messages.map(m =>
+              m.id === userMessageId
+                ? { 
+                    ...m, 
+                    retryCount: nextRetryCount,
+                    error: isRateLimit ? 'Rate limited - retrying...' : 'Retrying...'
+                  }
+                : m
+            ),
+          }));
+          
+          // Wait before retry
+          await wait(delay);
+          
+          // Retry the request
+          return get().sendMessageWithRetry(userMessageId, request, nextRetryCount);
+        } else {
+          // Max retries reached - mark as failed
+          set((state) => ({
+            messages: state.messages.map(m =>
+              m.id === userMessageId
+                ? { 
+                    ...m, 
+                    status: 'failed' as const,
+                    error: isRateLimit 
+                      ? 'Rate limit exceeded. Please try again later.' 
+                      : errorMessage,
+                    retryCount: RETRY_CONFIG.maxRetries
+                  }
+                : m
+            ),
+            loading: { ...state.loading, sending: false },
+            error: { 
+              ...state.error, 
+              sending: isRateLimit 
+                ? 'Rate limit exceeded. Please wait before sending more messages.' 
+                : errorMessage 
+            },
+          }));
+        }
       }
+    },
+
+    retryMessage: async (messageId: string) => {
+      const state = get();
+      const message = state.messages.find(m => m.id === messageId);
+      
+      if (!message || message.role !== 'user' || message.status !== 'failed') {
+        console.warn('Cannot retry message:', messageId, message?.status);
+        return;
+      }
+
+      // Reset the message status to retry
+      set((state) => ({
+        messages: state.messages.map(m =>
+          m.id === messageId
+            ? { 
+                ...m, 
+                status: 'pending',
+                error: undefined,
+                retryCount: 0
+              }
+            : m
+        ),
+        loading: { ...state.loading, sending: true },
+        error: { ...state.error, sending: null },
+      }));
+
+      const request: SendMessageRequest = {
+        chatId: message.chatId,
+        content: message.content
+      };
+
+      return get().sendMessageWithRetry(messageId, request, 0);
     },
 
     clearError: (type: 'chats' | 'messages' | 'sending') => {

@@ -2,7 +2,6 @@ import EmbeddingService from '../llm/embeddingService';
 import TextProcessor from '../llm/textProcessor';
 import VectorRepository from '../repositories/vectorRepository';
 import { AttachmentProcessor } from '../parsers/attachmentProcessor';
-import { vectorizationCache } from '../utils/vectorizationCache';
 
 export interface VectorizationOptions {
   batchSize?: number;
@@ -81,46 +80,20 @@ export class VectorizationService {
       const processedText = this.textProcessor.cleanText(combinedText);
       const chunks = this.textProcessor.chunkText(processedText);
 
-      // Check cache first
+      // Generate embedding for the main content
       const firstChunk = chunks.length > 0 ? chunks[0].content : processedText;
-      const cachedResult = vectorizationCache.get(firstChunk);
-      
-      let mainEmbedding: number[];
-      let textChunks: any;
-      
-      if (cachedResult) {
-        // Use cached embedding
-        mainEmbedding = cachedResult.embedding;
-        textChunks = cachedResult.textChunks;
-        console.log(`Using cached embedding for email ${emailContent.id}`);
-      } else {
-        // Generate new embedding
-        const embeddingResponse = await this.embeddingService.generateEmbedding({
-          text: firstChunk
-        });
-        mainEmbedding = embeddingResponse.embedding;
+      const embeddingResponse = await this.embeddingService.generateEmbedding({
+        text: firstChunk
+      });
+      const mainEmbedding = embeddingResponse.embedding;
 
-        // Prepare text chunks metadata
-        textChunks = {
-          chunks: chunks,
-          totalLength: processedText.length,
-          chunkCount: chunks.length,
-          processedAt: new Date().toISOString(),
-        };
-        
-        // Prepare cache metadata
-        const cacheMetadata = {
-          hasAttachments: emailContent.attachments && emailContent.attachments.length > 0,
-          attachmentCount: emailContent.attachments?.length || 0,
-          originalLength: combinedText.length,
-          processedLength: processedText.length,
-          chunkCount: chunks.length,
-        };
-        
-        // Cache the result
-        vectorizationCache.set(firstChunk, mainEmbedding, textChunks, cacheMetadata);
-        console.log(`Cached new embedding for email ${emailContent.id}`);
-      }
+      // Prepare text chunks metadata
+      const textChunks = {
+        chunks: chunks,
+        totalLength: processedText.length,
+        chunkCount: chunks.length,
+        processedAt: new Date().toISOString(),
+      };
 
       // Prepare metadata
       const metadata = {
@@ -256,27 +229,6 @@ export class VectorizationService {
    */
   async getVectorizationStats(userId: string) {
     return await this.vectorRepository.getVectorizationStats(userId);
-  }
-
-  /**
-   * Get cache performance metrics
-   */
-  getCacheStats() {
-    const stats = vectorizationCache.getStats();
-    
-    return {
-      ...stats,
-      hitRatePercentage: `${(stats.hitRate * 100).toFixed(1)}%`,
-      cacheEfficiency: stats.hitRate > 0.5 ? 'Good' : stats.hitRate > 0.2 ? 'Fair' : 'Poor',
-      memoryUsage: `${stats.size}/${stats.maxSize} entries`,
-    };
-  }
-
-  /**
-   * Clean up expired cache entries
-   */
-  cleanupCache(): number {
-    return vectorizationCache.cleanup();
   }
 
   /**

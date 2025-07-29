@@ -25,7 +25,7 @@ vi.mock('next/headers', () => ({
   })),
 }));
 
-// Mock security module
+// Mock security module - always allow in tests
 vi.mock('@/lib/security', () => ({
   checkRateLimit: vi.fn(() => ({ allowed: true, remaining: 99, resetTime: Date.now() + 60000 })),
   getClientIP: vi.fn(() => '192.168.1.1'),
@@ -35,15 +35,20 @@ describe('/api/chats', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
-    // Setup default mocks
+    // Setup default mocks with proper chainable structure
     mockSupabaseFrom.mockImplementation(() => {
       const chainable = {
-        select: mockSupabaseSelect,
-        insert: mockSupabaseInsert,
+        select: vi.fn(() => chainable),
+        insert: vi.fn(() => chainable),
         eq: vi.fn(() => chainable),
         order: vi.fn(() => chainable),
         single: vi.fn(() => chainable),
       };
+      
+      // Set the actual mocks on the chainable object
+      chainable.select = mockSupabaseSelect.mockReturnValue(chainable);
+      chainable.insert = mockSupabaseInsert.mockReturnValue(chainable);
+      
       return chainable;
     });
   });
@@ -71,7 +76,14 @@ describe('/api/chats', () => {
       ];
 
       mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
-      mockSupabaseSelect.mockResolvedValue({ data: mockChats, error: null });
+      
+      // Mock the chainable calls for GET
+      const chainable = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: mockChats, error: null }),
+      };
+      mockSupabaseFrom.mockReturnValue(chainable);
 
       const request = new NextRequest('http://localhost:3000/api/chats', {
         method: 'GET',
@@ -114,10 +126,14 @@ describe('/api/chats', () => {
       const mockUser = { id: 'user-123', email: 'test@example.com' };
       
       mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
-      mockSupabaseSelect.mockResolvedValue({ 
-        data: null, 
-        error: { message: 'Database error' } 
-      });
+      
+      // Mock the chainable calls for GET with error
+      const chainable = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } }),
+      };
+      mockSupabaseFrom.mockReturnValue(chainable);
 
       const request = new NextRequest('http://localhost:3000/api/chats', {
         method: 'GET',
@@ -132,7 +148,7 @@ describe('/api/chats', () => {
 
     it('should return 429 when rate limited', async () => {
       const { checkRateLimit } = await import('@/lib/security');
-      vi.mocked(checkRateLimit).mockReturnValue({ 
+      vi.mocked(checkRateLimit).mockReturnValueOnce({ 
         allowed: false, 
         remaining: 0, 
         resetTime: Date.now() + 60000 
@@ -161,7 +177,23 @@ describe('/api/chats', () => {
       };
 
       mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
-      mockSupabaseInsert.mockResolvedValue({ data: mockChat, error: null });
+      
+      // Mock multiple from() calls for different operations
+      mockSupabaseFrom.mockImplementation((table) => {
+        if (table === 'users') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockUser, error: null }),
+          };
+        } else if (table === 'chats') {
+          return {
+            insert: vi.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockChat, error: null }),
+          };
+        }
+      });
 
       const request = new NextRequest('http://localhost:3000/api/chats', {
         method: 'POST',
@@ -190,12 +222,28 @@ describe('/api/chats', () => {
       const mockChat = {
         id: 'chat-123',
         user_id: 'user-123',
-        title: 'This is a long first message that should be truncated',
+        title: 'This is a long first message that should be trunca',
         created_at: '2023-07-27T12:00:00Z',
       };
 
       mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
-      mockSupabaseInsert.mockResolvedValue({ data: mockChat, error: null });
+      
+      // Mock multiple from() calls for different operations
+      mockSupabaseFrom.mockImplementation((table) => {
+        if (table === 'users') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockUser, error: null }),
+          };
+        } else if (table === 'chats') {
+          return {
+            insert: vi.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockChat, error: null }),
+          };
+        }
+      });
 
       const request = new NextRequest('http://localhost:3000/api/chats', {
         method: 'POST',
@@ -211,7 +259,7 @@ describe('/api/chats', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.chat.title).toBe('This is a long first message that should be truncated');
+      expect(data.chat.title).toBe('This is a long first message that should be trunca');
     });
 
     it('should create a chat with default title when no title or firstMessage provided', async () => {
@@ -224,7 +272,23 @@ describe('/api/chats', () => {
       };
 
       mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
-      mockSupabaseInsert.mockResolvedValue({ data: mockChat, error: null });
+      
+      // Mock multiple from() calls for different operations
+      mockSupabaseFrom.mockImplementation((table) => {
+        if (table === 'users') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockUser, error: null }),
+          };
+        } else if (table === 'chats') {
+          return {
+            insert: vi.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockChat, error: null }),
+          };
+        }
+      });
 
       const request = new NextRequest('http://localhost:3000/api/chats', {
         method: 'POST',
@@ -283,9 +347,22 @@ describe('/api/chats', () => {
       const mockUser = { id: 'user-123', email: 'test@example.com' };
       
       mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
-      mockSupabaseInsert.mockResolvedValue({ 
-        data: null, 
-        error: { message: 'Database error' } 
+      
+      // Mock multiple from() calls - users success, chats error
+      mockSupabaseFrom.mockImplementation((table) => {
+        if (table === 'users') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockUser, error: null }),
+          };
+        } else if (table === 'chats') {
+          return {
+            insert: vi.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } }),
+          };
+        }
       });
 
       const request = new NextRequest('http://localhost:3000/api/chats', {

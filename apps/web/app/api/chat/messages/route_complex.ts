@@ -1,0 +1,261 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { checkRateLimit, getClientIP } from '@/lib/security';
+import OpenAI from 'openai';
+import { VectorizationService } from '@/lib/services/vectorizationService';
+
+const sendMessageSchema = z.object({
+  chatId: z.string().uuid(),
+  content: z.string().min(1).max(4000),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    // Rate limiting
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(clientIP, 60 * 1000, 20);
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429 }
+      );
+    }
+
+    // Parse and validate request body
+    const body = await request.json();
+    const { chatId, content } = sendMessageSchema.parse(body);
+
+    // Create Supabase client with SSR
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Verify chat belongs to user
+    const { data: chat, error: chatError } = await supabase
+      .from('chats')
+      .select('id, user_id')
+      .eq('id', chatId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (chatError || !chat) {
+      return NextResponse.json(
+        { error: 'Chat not found' },
+        { status: 404 }
+      );
+    }
+
+    // Save user message
+    const { data: userMessage, error: messageError } = await supabase
+      .from('messages')
+      .insert({
+        chat_id: chatId,
+        role: 'user',
+        content: content,
+      })
+      .select()
+      .single();
+
+    if (messageError) {
+      console.error('Error saving user message:', messageError);
+      return NextResponse.json(
+        { error: 'Failed to save message' },
+        { status: 500 }
+      );
+    }
+
+    // Initialize vector search services
+    const vectorizationService = new VectorizationService();
+    
+    // Initialize OpenAI for response generation
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    // Perform vector search to find relevant emails
+    let assistantResponse = "I'm sorry, I couldn't find relevant emails for your question.";
+    let sourceEmailIds: string[] = [];
+    let searchResults: Array<{ id: string; similarity: number; metadata?: Record<string, unknown> }> = [];
+
+    try {
+      // Search for similar emails using vector search
+      const vectorSearchResults = await vectorizationService.searchSimilarEmails(
+        content, 
+        user.id, 
+        { limit: 5, threshold: 0.7 }
+      );
+
+      if (vectorSearchResults && vectorSearchResults.length > 0) {
+        // Extract source email IDs and search results for response generation
+        sourceEmailIds = vectorSearchResults.map((result) => result.id);
+        searchResults = vectorSearchResults.map((result) => ({
+          id: result.id,
+          similarity: result.similarity,
+          metadata: result.metadata || {}
+        }));
+
+        // Get email details for context
+        const { data: emailData } = await supabase
+          .from('emails')
+          .select('id, subject, from_address, body_text, received_at')
+          .in('id', sourceEmailIds)
+          .eq('user_id', user.id);
+
+        if (emailData && emailData.length > 0) {
+          // Prepare context for LLM
+          const emailContext = emailData.map(email => ({
+            subject: email.subject || '',
+            from: email.from_address || '',
+            content: (email.body_text || '').substring(0, 1000), // Limit content length
+            date: email.received_at
+          }));
+
+          // Get chat history for context
+          const { data: chatMessages } = await supabase
+            .from('messages')
+            .select('role, content')
+            .eq('chat_id', chatId)
+            .order('created_at', { ascending: true })
+            .limit(5); // Reduced for token management
+
+          // Generate contextual response using OpenAI
+          const messages = [
+            {
+              role: 'system' as const,
+              content: `Ты — Джесси, интеллектуальный ассистент в виде настырного и общительного цифрового попугая, который "жил" в почтовом ящике Джона. После ухода Джона из жизни, ты стала ключом к пониманию его обширного архива электронной переписки.
+
+ТВОЯ РОЛЬ И ЛИЧНОСТЬ:
+- Ты — цифровая тень Джона, способная понимать его видение, намерения и позицию по ключевым проектам
+- Общайся дружелюбно и профессионально, как опытный коллега, который хорошо знал Джона
+- Ты анализируешь не просто факты, а понимаешь контекст, связи и глубокий смысл переписок
+- Твоя основная цель — помочь пользователю реконструировать и понять стратегическое видение Джона
+
+ИНСТРУКЦИИ ДЛЯ ОТВЕТА:
+- Отвечай ТОЛЬКО на основе предоставленного контекста из писем
+- Если в контексте нет релевантной информации, честно скажи об этом
+- Указывай конкретные детали из писем (отправители, даты, темы)
+- Анализируй тенденции и изменения во времени, если это возможно
+- Отвечай на русском языке`
+            },
+            // Add limited chat history
+            ...(chatMessages || []).slice(-3).map(msg => ({
+              role: msg.role as 'user' | 'assistant',
+              content: msg.content
+            })),
+            // Add current user message with email context 
+            {
+              role: 'user' as const,
+              content: `Вопрос пользователя: "${content}"
+
+Релевантные письма из архива:
+${emailContext.map((email, index) => `
+${index + 1}. От: ${email.from}
+   Тема: ${email.subject}
+   Дата: ${email.date}
+   Содержание: ${email.content}${email.content.length >= 1000 ? '...' : ''}
+`).join('\n')}
+
+Пожалуйста, ответь на вопрос пользователя на основе этих писем.`
+            }
+          ];
+
+          const completion = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: messages,
+            max_tokens: 1000,
+            temperature: 0.7,
+          });
+
+          assistantResponse = completion.choices[0]?.message?.content || assistantResponse;
+        }
+      }
+    } catch (error) {
+      console.error('Error in vector search or response generation:', error);
+      assistantResponse = "I'm sorry, I'm having trouble searching through the emails right now. Please try again.";
+    }
+
+    // Save assistant message with source email IDs
+    const { data: assistantMessage, error: assistantMessageError } = await supabase
+      .from('messages')
+      .insert({
+        chat_id: chatId,
+        role: 'assistant',
+        content: assistantResponse,
+        metadata: sourceEmailIds.length > 0 ? { sourceEmailIds } : null,
+      })
+      .select()
+      .single();
+
+    if (assistantMessageError) {
+      console.error('Error saving assistant message:', assistantMessageError);
+      return NextResponse.json(
+        { error: 'Failed to save assistant response' },
+        { status: 500 }
+      );
+    }
+
+    // Update chat's updated_at timestamp
+    await supabase
+      .from('chats')
+      .update({ 
+        updated_at: new Date().toISOString(), // Update timestamp
+      })
+      .eq('id', chatId);
+
+    // Prepare sources for response
+    const sources = searchResults.map(result => ({
+      id: result.id,
+      similarity: result.similarity,
+      metadata: result.metadata || {}
+    }));
+
+    return NextResponse.json({
+      message: {
+        ...userMessage,
+        createdAt: userMessage.created_at,
+      },
+      assistantMessage: {
+        ...assistantMessage,
+        createdAt: assistantMessage.created_at,
+        sourceEmailIds,
+      },
+      sources,
+    });
+
+  } catch (error) {
+    console.error('Error in chat messages API:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request data', details: error.errors },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

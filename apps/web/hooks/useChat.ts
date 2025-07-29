@@ -87,6 +87,7 @@ export function useChat() {
     deleteChat: store.deleteChat,
     loadMessages: store.loadMessages,
     sendMessage: store.sendMessage,
+    retryMessage: store.retryMessage,
     clearError: store.clearError,
     reset: store.reset,
 

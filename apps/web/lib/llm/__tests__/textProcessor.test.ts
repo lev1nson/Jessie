@@ -29,6 +29,7 @@ describe('TextProcessor', () => {
     });
 
     it('should remove control characters', () => {
+      // eslint-disable-next-line no-control-regex
       const input = 'Hello\x00\x01World\x7F';
       const result = textProcessor.cleanText(input);
       

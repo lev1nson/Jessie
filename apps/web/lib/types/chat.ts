@@ -22,6 +22,9 @@ export interface Message {
   sourceEmailIds?: string[];
   sources?: EmailSource[];
   createdAt: Date;
+  status?: 'pending' | 'sent' | 'failed';
+  retryCount?: number;
+  error?: string;
 }
 
 export interface ChatState {
@@ -48,6 +51,11 @@ export interface CreateChatRequest {
 export interface SendMessageRequest {
   chatId: string;
   content: string;
+}
+
+export interface RetryConfig {
+  maxRetries: number;
+  retryDelays: number[]; // delays in ms for each retry attempt
 }
 
 export interface ChatResponse {

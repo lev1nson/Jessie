@@ -355,9 +355,9 @@ describe('EmailFilter', () => {
     it('should handle null/undefined fields gracefully', () => {
       const nullEmail: ParsedEmail = {
         ...mockEmail,
-        // @ts-ignore - Testing runtime behavior
+        // @ts-expect-error - Testing runtime behavior
         sender: null,
-        // @ts-ignore - Testing runtime behavior
+        // @ts-expect-error - Testing runtime behavior
         subject: undefined,
       };
 
@@ -392,9 +392,9 @@ describe('EmailFilter', () => {
     it('should handle null/undefined fields in normalization', () => {
       const emailWithNulls: ParsedEmail = {
         ...mockEmail,
-        // @ts-ignore - Testing runtime behavior
+        // @ts-expect-error - Testing runtime behavior
         sender: null,
-        // @ts-ignore - Testing runtime behavior
+        // @ts-expect-error - Testing runtime behavior
         subject: undefined,
       };
 

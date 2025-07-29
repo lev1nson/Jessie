@@ -168,6 +168,9 @@ describe('EmailRepository', () => {
           body_html: '<p>Body 1</p>',
           date_sent: '2024-01-01T00:00:00.000Z',
           has_attachments: false,
+          is_filtered: false,
+          filter_reason: null,
+          processed_at: null,
         },
         {
           user_id: 'user123',
@@ -180,6 +183,9 @@ describe('EmailRepository', () => {
           body_html: '<p>Body 2</p>',
           date_sent: '2024-01-01T01:00:00.000Z',
           has_attachments: true,
+          is_filtered: false,
+          filter_reason: null,
+          processed_at: null,
         },
       ]);
       expect(mockSupabaseClient.select).toHaveBeenCalled();
@@ -291,16 +297,13 @@ describe('EmailRepository', () => {
     });
 
     it('should return 0 for database errors', async () => {
-      const mockCountClient = {
-        ...mockSupabaseClient,
-        select: vi.fn().mockResolvedValue({
-          count: null,
-          error: { message: 'Database error' },
-        }),
-      };
-      
-      mockSupabaseClient.from.mockReturnValue(mockCountClient);
-      mockCountClient.eq.mockReturnValue(mockCountClient);
+      // Reset the mock to ensure proper method chaining
+      mockSupabaseClient.from.mockReturnValue(mockSupabaseClient);
+      mockSupabaseClient.select.mockReturnValue(mockSupabaseClient);
+      mockSupabaseClient.eq.mockResolvedValue({
+        count: null,
+        error: { message: 'Database error' },
+      });
 
       const result = await emailRepository.getEmailCount('user123');
 

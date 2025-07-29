@@ -521,7 +521,7 @@ describe('AttachmentProcessor', () => {
 
   describe('error handling and edge cases', () => {
     it('should handle null/undefined buffer', async () => {
-      // @ts-ignore - Testing runtime behavior
+      // @ts-expect-error - Testing runtime behavior
       const result = await attachmentProcessor.processAttachment(null, mockPdfAttachment);
 
       expect(result.success).toBe(false);
@@ -534,7 +534,7 @@ describe('AttachmentProcessor', () => {
         // Missing required fields
       } as AttachmentInfo;
 
-      // @ts-ignore - Testing runtime behavior
+      // @ts-expect-error - Testing runtime behavior
       const result = await attachmentProcessor.processAttachment(mockPdfBuffer, invalidAttachment);
 
       expect(result.success).toBe(false);

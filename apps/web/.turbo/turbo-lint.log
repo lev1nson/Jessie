@@ -1,6 +1,6 @@
 
 > web@0.1.0 lint
-> next lint
+> next lint --max-warnings 1000
 
 
 ./app/api/auth/google/callback/__tests__/route.test.ts
@@ -37,7 +37,58 @@
 92:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./app/api/cron/email-sync/route.ts
-272:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+321:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/debug/database/route.ts
+4:27  Error: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+23:21  Error: 'testData' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/debug/emails/route.ts
+4:27  Error: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/debug/schema/route.ts
+4:27  Error: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/debug/sync-test/route.ts
+6:28  Error: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/health/cron/route.ts
+27:38  Error: 'statusError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+35:11  Error: 'fourHoursAgo' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/health/database/route.ts
+11:13  Error: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/health/gmail/route.ts
+27:11  Error: 'oauth2Client' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/health/route.ts
+36:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/indexing/sync/route_simple.ts
+3:28  Error: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/dashboard/admin/status/page.tsx
+18:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/test-rag/page.tsx
+86:19  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+86:50  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+87:19  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+87:67  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+88:19  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+88:61  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+89:19  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+89:66  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./components/admin/AdvancedMonitoring.tsx
+22:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+132:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:11  Error: 'getUsageColor' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+204:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/admin/PerformanceMetrics.tsx
+5:10  Error: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
 
 ./components/features/auth/AuthGuard.test.tsx
 39:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -55,9 +106,6 @@
 ./components/features/chat/ChatMessages.test.tsx
 17:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
-./components/features/chat/ChatMessages.tsx
-10:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-
 ./lib/__tests__/performance.test.ts
 364:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
@@ -69,15 +117,6 @@
 ./lib/__tests__/vectorizationPerformance.test.ts
 12:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 13:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-
-./lib/filters/__tests__/domainFilter.test.ts
-334:7  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
-
-./lib/filters/__tests__/emailFilter.test.ts
-358:9  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
-360:9  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
-395:9  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
-397:9  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
 
 ./lib/gmail/__tests__/service.test.ts
 10:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -100,6 +139,11 @@
 188:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 191:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
+./lib/gmail/simpleService.ts
+4:20  Error: 'credentials' is defined but never used.  @typescript-eslint/no-unused-vars
+4:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+9:41  Error: 'folders' is defined but never used.  @typescript-eslint/no-unused-vars
+
 ./lib/llm/__tests__/embeddingService.test.ts
 10:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 18:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -108,8 +152,24 @@
 9:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 16:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
-./lib/llm/textProcessor.ts
-41:16  Error: Unexpected control character(s) in regular expression: \x00, \x08, \x0b, \x0c, \x0e, \x1f.  no-control-regex
+./lib/monitoring/alerting.ts
+130:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+203:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+239:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/monitoring/anomalyDetection.ts
+4:11  Error: 'MetricPoint' is defined but never used.  @typescript-eslint/no-unused-vars
+202:35  Error: 'metricName' is defined but never used.  @typescript-eslint/no-unused-vars
+202:55  Error: 'tags' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./lib/monitoring/metrics.ts
+74:13  Error: 'timeRangeMap' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+137:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+163:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+239:133  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/monitoring/middleware.ts
+71:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/parsers/__tests__/attachmentProcessor.test.ts
 2:31  Error: 'ProcessorResult' is defined but never used.  @typescript-eslint/no-unused-vars
@@ -118,8 +178,6 @@
 432:13  Error: 'result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
 438:13  Error: 'result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
 450:13  Error: 'result' is assigned a value but never used.  @typescript-eslint/no-unused-vars
-524:7  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
-537:7  Error: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
 
 ./lib/parsers/docxParser.ts
 37:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -143,11 +201,18 @@
 
 ./lib/repositories/__tests__/emailRepository.test.ts
 48:76  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-280:75  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+286:75  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/repositories/__tests__/vectorRepository.test.ts
 12:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 33:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+325:13  Error: 'mockTotalFrom' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+335:13  Error: 'mockVectorizedFrom' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./lib/repositories/simpleEmailRepository.ts
+34:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+40:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+57:15  Error: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
 
 ./lib/repositories/vectorRepository.ts
 7:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -170,9 +235,6 @@
 437:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 449:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 461:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
-
-./lib/services/vectorizationService.ts
-89:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./lib/stores/chatStore.test.ts
 46:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
@@ -198,4 +260,4 @@ npm error path /Users/max/Documents/Coding/Jessie/apps/web
 npm error workspace web@0.1.0
 npm error location /Users/max/Documents/Coding/Jessie/apps/web
 npm error command failed
-npm error command sh -c next lint
+npm error command sh -c next lint --max-warnings 1000

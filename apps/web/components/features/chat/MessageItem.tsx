@@ -1,17 +1,18 @@
 'use client';
 
 import { formatDistanceToNow, format } from 'date-fns';
-import { User, Bot, Mail, Copy, Check } from 'lucide-react';
+import { User, Bot, Mail, Copy, Check, AlertCircle, RefreshCw, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Message } from './ChatMessages';
+import { Message } from '@/lib/types/chat';
 
 interface MessageItemProps {
   message: Message;
   isLast?: boolean;
+  onRetry?: (messageId: string) => void;
 }
 
-export function MessageItem({ message }: MessageItemProps) {
+export function MessageItem({ message, onRetry }: MessageItemProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   
@@ -63,6 +64,43 @@ export function MessageItem({ message }: MessageItemProps) {
           <div className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">
             {message.content}
           </div>
+
+          {/* Message Status (for user messages) */}
+          {isUser && message.status && (
+            <div className="mt-2 flex items-center gap-2">
+              {message.status === 'pending' && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="w-3 h-3 animate-pulse" />
+                  <span>
+                    {message.retryCount && message.retryCount > 0 
+                      ? `Retrying... (${message.retryCount}/${3})`
+                      : 'Sending...'
+                    }
+                  </span>
+                </div>
+              )}
+              
+              {message.status === 'failed' && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 text-xs text-destructive">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>{message.error || 'Failed to send'}</span>
+                  </div>
+                  {onRetry && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRetry(message.id)}
+                      className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      Retry
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Source Emails Indicator */}
           {!isUser && message.sourceEmailIds && message.sourceEmailIds.length > 0 && (

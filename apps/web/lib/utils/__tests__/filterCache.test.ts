@@ -141,13 +141,13 @@ describe('FilterCache Performance Tests', () => {
       
       // Mix of hits and misses
       for (let i = 0; i < 1000; i++) {
-        if (i % 3 < cachedData.length) {
-          // This should be a hit
+        if (i % 4 < cachedData.length) {
+          // This should be a hit (i % 4 = 0, 1, 2)
           const data = cachedData[i % 3];
           const result = filterCache.get(data.sender, data.subject, data.body);
           expect(result).not.toBeNull();
         } else {
-          // This should be a miss
+          // This should be a miss (i % 4 = 3)
           const result = filterCache.get(`new${i}@example.com`, `Subject ${i}`, `Body ${i}`);
           expect(result).toBeNull();
         }

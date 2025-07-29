@@ -3,41 +3,29 @@
 import { useEffect, useRef } from 'react';
 import { MessageItem } from './MessageItem';
 import { Loader2 } from 'lucide-react';
-
-export interface EmailSource {
-  id: string;
-  similarity: number;
-  metadata: any;
-}
-
-export interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  sourceEmailIds?: string[];
-  sources?: EmailSource[];
-  createdAt: Date;
-}
+import { Message } from '@/lib/types/chat';
 
 interface ChatMessagesProps {
   messages: Message[];
   loading?: boolean;
   error?: string | null;
   onRetry?: () => void;
+  onRetryMessage?: (messageId: string) => void;
 }
 
 export function ChatMessages({ 
   messages, 
   loading = false, 
   error = null,
-  onRetry 
+  onRetry,
+  onRetryMessage
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && messagesEndRef.current.scrollIntoView) {
       messagesEndRef.current.scrollIntoView({ 
         behavior: 'smooth',
         block: 'end'
@@ -100,6 +88,7 @@ export function ChatMessages({
               key={message.id}
               message={message}
               isLast={index === messages.length - 1}
+              onRetry={onRetryMessage}
             />
           ))}
           

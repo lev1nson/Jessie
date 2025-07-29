@@ -44,7 +44,7 @@ describe('VectorizationCache', () => {
     it('should expire entries after TTL', async () => {
       // Create cache with short TTL for testing
       const shortTtlCache = new VectorizationCache();
-      shortTtlCache.configure({ ttlMs: 100 }); // 100ms TTL
+      shortTtlCache.configure({ ttlMs: 10 }); // 10ms TTL for faster test
       
       const text = 'Expiring content';
       const embedding = [1, 2, 3];
@@ -53,7 +53,7 @@ describe('VectorizationCache', () => {
       expect(shortTtlCache.has(text)).toBe(true);
       
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       expect(shortTtlCache.has(text)).toBe(false);
       expect(shortTtlCache.get(text)).toBeNull();
@@ -61,7 +61,7 @@ describe('VectorizationCache', () => {
 
     it('should clean up expired entries', async () => {
       const shortTtlCache = new VectorizationCache();
-      shortTtlCache.configure({ ttlMs: 50 });
+      shortTtlCache.configure({ ttlMs: 10 });
       
       // Add multiple entries
       for (let i = 0; i < 5; i++) {
@@ -71,7 +71,7 @@ describe('VectorizationCache', () => {
       expect(shortTtlCache.getStats().size).toBe(5);
       
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const removedCount = shortTtlCache.cleanup();
       expect(removedCount).toBe(5);

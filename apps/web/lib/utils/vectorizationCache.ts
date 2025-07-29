@@ -112,7 +112,7 @@ export class VectorizationCache {
    * Evict oldest entries when cache is full
    */
   private evictOldest(): void {
-    const entriesToRemove = Math.floor(this.maxSize * 0.1); // Remove 10% of entries
+    const entriesToRemove = Math.max(1, Math.floor(this.maxSize * 0.1)); // Remove at least 1 entry
     const sortedEntries = Array.from(this.cache.entries())
       .sort(([, a], [, b]) => a.timestamp - b.timestamp)
       .slice(0, entriesToRemove);

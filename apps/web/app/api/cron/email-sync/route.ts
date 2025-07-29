@@ -7,6 +7,8 @@ import { EmailFilter } from '@/lib/filters/emailFilter';
 import { HtmlParser } from '@/lib/parsers/htmlParser';
 import { AttachmentProcessor } from '@/lib/parsers/attachmentProcessor';
 import { VectorizationService } from '@/lib/services/vectorizationService';
+import { recordEmailSyncMetrics } from '@/lib/monitoring/middleware';
+import { recordSystemStatus } from '@/lib/monitoring/metrics';
 
 // Интерфейс для пользователя с токенами
 interface UserWithTokens {
@@ -18,6 +20,8 @@ interface UserWithTokens {
 }
 
 export async function GET(request: NextRequest) {
+  const cronStartTime = Date.now();
+  
   // Проверяем авторизацию cron job
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -25,6 +29,12 @@ export async function GET(request: NextRequest) {
   }
 
   console.log('Starting email sync cron job...');
+  
+  // Record cron job start
+  await recordSystemStatus('email_sync_cron', 'healthy', { 
+    status: 'started',
+    timestamp: new Date().toISOString() 
+  });
   
   const supabase = createServiceSupabase();
   const emailRepository = new EmailRepository();
@@ -62,22 +72,52 @@ export async function GET(request: NextRequest) {
 
     // Обрабатываем каждого пользователя
     for (const user of users as UserWithTokens[]) {
+      const userStartTime = Date.now();
       try {
         const emailsProcessed = await processUserEmails(user, emailRepository);
         totalEmailsProcessed += emailsProcessed;
         processedUsers++;
+        
+        // Record user-specific metrics
+        const userSyncDuration = Date.now() - userStartTime;
+        await recordEmailSyncMetrics(user.id, emailsProcessed, userSyncDuration);
+        
         console.log(`Successfully processed user ${user.email} - ${emailsProcessed} emails`);
       } catch (error) {
         const errorMessage = `Failed to process user ${user.email}: ${error}`;
         console.error(errorMessage);
         errors.push(errorMessage);
+        
+        // Record error metrics
+        const userSyncDuration = Date.now() - userStartTime;
+        await recordEmailSyncMetrics(user.id, 0, userSyncDuration, 1);
       }
     }
+
+    const cronDuration = Date.now() - cronStartTime;
+    const hasErrors = errors.length > 0;
+    
+    // Record overall cron job metrics
+    await Promise.all([
+      recordSystemStatus(
+        'email_sync_cron', 
+        hasErrors ? 'degraded' : 'healthy', 
+        { 
+          status: 'completed',
+          processedUsers,
+          totalEmailsProcessed,
+          errors: errors.length,
+          duration: cronDuration
+        }
+      ),
+      recordEmailSyncMetrics('system', totalEmailsProcessed, cronDuration, errors.length)
+    ]);
 
     const result = {
       message: 'Email sync completed',
       processedUsers,
       totalEmailsProcessed,
+      duration: cronDuration,
       errors: errors.length > 0 ? errors : undefined,
     };
 
@@ -85,6 +125,15 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(result);
   } catch (error) {
+    const cronDuration = Date.now() - cronStartTime;
+    
+    // Record critical failure
+    await recordSystemStatus('email_sync_cron', 'down', { 
+      status: 'failed',
+      error: String(error),
+      duration: cronDuration
+    });
+    
     console.error('Email sync cron job failed:', error);
     return NextResponse.json(
       { error: 'Email sync failed', details: String(error) },
